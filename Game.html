@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>背包數學大師 - 面積與乘法</title>
     <style>
         body {
@@ -12,22 +12,29 @@
             flex-direction: column;
             align-items: center;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
+            overscroll-behavior: none; /* 防止手機下拉重整 */
         }
-        h1 { color: #2c3e50; margin-bottom: 10px; }
-        .game-container {
+        h1 { color: #2c3e50; margin-bottom: 5px; font-size: 24px; }
+        
+        .game-wrapper {
             display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 20px;
             background: white;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 100%;
         }
+
         canvas {
             border: 2px solid #333;
             border-radius: 5px;
             cursor: grab;
             background-color: #eee;
+            touch-action: none; /* 防止觸控時捲動畫面 */
         }
         canvas:active { cursor: grabbing; }
         
@@ -68,12 +75,16 @@
         #btn-clear:hover { background-color: #d32f2f; }
 
         .math-feedback {
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
             min-height: 30px;
             color: #555;
             font-weight: bold;
-            margin-top: 10px;
+            margin: 10px 0;
+            padding: 5px;
+            background: #fff;
+            border-radius: 5px;
+            width: 100%;
         }
     </style>
 </head>
@@ -82,7 +93,7 @@
     <h1>🎒 背包數學大師</h1>
     <div class="math-feedback" id="math-feedback">請拖曳物品放入背包</div>
 
-    <div class="game-container">
+    <div class="game-wrapper">
         <canvas id="gameCanvas" width="800" height="500"></canvas>
 
         <div class="sidebar">
@@ -96,11 +107,11 @@
 
             <div class="info-panel" style="background: #fff3e0; border-left-color: #ff9800;">
                 <h3>💡 當前物品</h3>
-                <div id="current-item-info">選取物品來查看乘法算式</div>
+                <div id="current-item-info">點擊物品查看算式</div>
             </div>
 
             <div class="controls">
-                <button id="btn-spawn">🎁 隨機生成物品</button>
+                <button id="btn-spawn">🎁 給我新物品</button>
                 <button id="btn-clear">🗑️ 清空背包</button>
             </div>
         </div>
@@ -115,25 +126,21 @@
         const uiFeedback = document.getElementById('math-feedback');
 
         // 遊戲參數
-        const GRID_SIZE = 40; // 每一格的大小 (px)
-        const GRID_COLS = 10; // 背包寬 (格)
-        const GRID_ROWS = 8;  // 背包高 (格)
+        const GRID_SIZE = 40; 
+        const GRID_COLS = 10; 
+        const GRID_ROWS = 8;  
         
-        // 背包在 Canvas 中的偏移量 (置中)
         const OFFSET_X = 50;
         const OFFSET_Y = 50;
         
-        // 背包實際像素大小
         const BACKPACK_W = GRID_COLS * GRID_SIZE;
         const BACKPACK_H = GRID_ROWS * GRID_SIZE;
 
-        // 物品列表
         let items = [];
         let draggedItem = null;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
 
-        // 物品定義 (寬x高)
         const ITEM_TYPES = [
             { name: "課本", w: 2, h: 3, color: "#3498db" },
             { name: "鉛筆盒", w: 3, h: 1, color: "#e74c3c" },
@@ -148,21 +155,18 @@
         class Item {
             constructor(type, x, y) {
                 this.name = type.name;
-                this.w = type.w; // 格子寬
-                this.h = type.h; // 格子高
+                this.w = type.w;
+                this.h = type.h;
                 this.color = type.color;
-                this.x = x; // 像素座標
+                this.x = x;
                 this.y = y;
-                this.isInside = false; // 是否正確放入背包
+                this.isInside = false;
             }
 
-            // 繪製物品
             draw(ctx) {
                 ctx.fillStyle = this.color;
-                // 繪製主體
                 ctx.fillRect(this.x, this.y, this.w * GRID_SIZE, this.h * GRID_SIZE);
                 
-                // 繪製格線 (顯示 1x1 結構)
                 ctx.strokeStyle = "rgba(255,255,255,0.5)";
                 ctx.lineWidth = 1;
                 for (let i = 0; i <= this.w; i++) {
@@ -178,12 +182,10 @@
                     ctx.stroke();
                 }
 
-                // 繪製邊框
                 ctx.strokeStyle = "#333";
                 ctx.lineWidth = 2;
                 ctx.strokeRect(this.x, this.y, this.w * GRID_SIZE, this.h * GRID_SIZE);
 
-                // 顯示名稱與尺寸
                 ctx.fillStyle = "white";
                 ctx.font = "bold 14px Arial";
                 ctx.shadowColor = "black";
@@ -193,45 +195,34 @@
             }
         }
 
-        // 初始化
         function init() {
-            // 生成初始物品
             spawnItem();
             spawnItem();
             spawnItem();
             draw();
         }
 
-        // 生成新物品 (出現在右側等待區)
         function spawnItem() {
             const type = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
-            // 隨機位置在右側區域
-            const startX = BACKPACK_W + OFFSET_X + 50;
-            const startY = 50 + Math.random() * 300;
-            
-            // 避免生成重疊太嚴重 (簡單處理)
+            // 確保生成在畫布右側可見區域
+            const startX = BACKPACK_W + OFFSET_X + 30;
+            const startY = 50 + Math.random() * 250;
             items.push(new Item(type, startX, startY));
             draw();
         }
 
-        // 檢查碰撞 (與其他已放置的物品)
         function checkCollision(currentItem, targetGridX, targetGridY) {
-            // 檢查是否超出邊界
             if (targetGridX < 0 || targetGridY < 0 || 
                 targetGridX + currentItem.w > GRID_COLS || 
                 targetGridY + currentItem.h > GRID_ROWS) {
                 return true;
             }
 
-            // 檢查是否與其他物品重疊
             for (let other of items) {
                 if (other === currentItem || !other.isInside) continue;
-
-                // 將像素座標轉換回網格座標進行比對
                 let otherGridX = Math.round((other.x - OFFSET_X) / GRID_SIZE);
                 let otherGridY = Math.round((other.y - OFFSET_Y) / GRID_SIZE);
 
-                // 矩形重疊判斷
                 if (targetGridX < otherGridX + other.w &&
                     targetGridX + currentItem.w > otherGridX &&
                     targetGridY < otherGridY + other.h &&
@@ -242,30 +233,24 @@
             return false;
         }
 
-        // 計算統計數據
         function updateStats() {
             let usedArea = 0;
             items.forEach(item => {
-                if (item.isInside) {
-                    usedArea += item.w * item.h;
-                }
+                if (item.isInside) usedArea += item.w * item.h;
             });
-            
             let totalArea = GRID_COLS * GRID_ROWS;
             uiUsedArea.innerText = usedArea;
             uiCoverage.innerText = Math.round((usedArea / totalArea) * 100) + "%";
         }
 
-        // 繪製畫面
         function draw() {
-            // 清除畫布
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. 繪製背包區域
+            // 背包背景
             ctx.fillStyle = "#ddd";
             ctx.fillRect(OFFSET_X, OFFSET_Y, BACKPACK_W, BACKPACK_H);
             
-            // 繪製背包網格
+            // 格線
             ctx.strokeStyle = "#bbb";
             ctx.lineWidth = 1;
             for (let i = 0; i <= GRID_COLS; i++) {
@@ -281,115 +266,116 @@
                 ctx.stroke();
             }
             
-            // 背包邊框
             ctx.strokeStyle = "#555";
             ctx.lineWidth = 3;
             ctx.strokeRect(OFFSET_X, OFFSET_Y, BACKPACK_W, BACKPACK_H);
             
-            // 標示背包文字
             ctx.fillStyle = "#666";
             ctx.font = "16px Arial";
             ctx.fillText("背包區域 (10x8)", OFFSET_X, OFFSET_Y - 10);
-            ctx.fillText("物品等待區", BACKPACK_W + OFFSET_X + 50, OFFSET_Y - 10);
 
-            // 2. 繪製物品 (先畫放置好的，再畫正在拖曳的)
             items.forEach(item => {
                 if (item !== draggedItem) item.draw(ctx);
             });
             if (draggedItem) {
-                // 繪製陰影效果
                 ctx.save();
                 ctx.globalAlpha = 0.6;
                 ctx.translate(5, 5);
                 draggedItem.draw(ctx);
                 ctx.restore();
-                
                 draggedItem.draw(ctx);
             }
         }
 
-        // 滑鼠事件監聽
-        canvas.addEventListener('mousedown', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+        // --- 輸入處理 (同時支援滑鼠與觸控) ---
 
-            // 檢查是否點擊到物品 (倒序檢查，先選上面的)
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function handleStart(e) {
+            if (e.type === 'touchstart') e.preventDefault(); // 防止捲動
+            const pos = getPointerPos(e);
+
             for (let i = items.length - 1; i >= 0; i--) {
                 let item = items[i];
-                if (mouseX >= item.x && mouseX <= item.x + item.w * GRID_SIZE &&
-                    mouseY >= item.y && mouseY <= item.y + item.h * GRID_SIZE) {
+                if (pos.x >= item.x && pos.x <= item.x + item.w * GRID_SIZE &&
+                    pos.y >= item.y && pos.y <= item.y + item.h * GRID_SIZE) {
                     
                     draggedItem = item;
-                    dragOffsetX = mouseX - item.x;
-                    dragOffsetY = mouseY - item.y;
+                    dragOffsetX = pos.x - item.x;
+                    dragOffsetY = pos.y - item.y;
                     
-                    // 把它移到陣列最後面，這樣渲染時會在最上層
                     items.splice(i, 1);
                     items.push(item);
 
-                    // 更新數學資訊
                     const area = item.w * item.h;
                     uiItemInfo.innerHTML = `
                         <strong>${item.name}</strong><br>
-                        長：${item.w} 格<br>
-                        寬：${item.h} 格<br>
-                        <span style="color:blue; font-size:1.1em">面積：${item.w} x ${item.h} = ${area}</span>
+                        尺寸：${item.w} x ${item.h}<br>
+                        <span style="color:blue; font-size:1.1em">面積：${area}</span>
                     `;
-                    uiFeedback.innerText = `正在移動：${item.w} x ${item.h} 的${item.name}`;
+                    uiFeedback.innerText = `移動中：${item.w} x ${item.h} 的${item.name}`;
                     
                     draw();
                     return;
                 }
             }
-        });
+        }
 
-        canvas.addEventListener('mousemove', (e) => {
+        function handleMove(e) {
             if (draggedItem) {
-                const rect = canvas.getBoundingClientRect();
-                draggedItem.x = e.clientX - rect.left - dragOffsetX;
-                draggedItem.y = e.clientY - rect.top - dragOffsetY;
+                if (e.type === 'touchmove') e.preventDefault();
+                const pos = getPointerPos(e);
+                draggedItem.x = pos.x - dragOffsetX;
+                draggedItem.y = pos.y - dragOffsetY;
                 draw();
             }
-        });
+        }
 
-        canvas.addEventListener('mouseup', (e) => {
+        function handleEnd(e) {
             if (draggedItem) {
-                // 嘗試貼齊網格
-                // 計算最接近的格子座標
                 const gridX = Math.round((draggedItem.x - OFFSET_X) / GRID_SIZE);
                 const gridY = Math.round((draggedItem.y - OFFSET_Y) / GRID_SIZE);
 
-                // 檢查是否合法 (碰撞或出界)
                 if (!checkCollision(draggedItem, gridX, gridY)) {
-                    // 吸附
                     draggedItem.x = OFFSET_X + gridX * GRID_SIZE;
                     draggedItem.y = OFFSET_Y + gridY * GRID_SIZE;
                     draggedItem.isInside = true;
-                    
-                    // 播放成功音效感 (視覺)
                     uiFeedback.innerText = `成功放入！面積增加 ${draggedItem.w * draggedItem.h}`;
                     uiFeedback.style.color = "green";
                 } else {
-                    // 放置失敗 (不吸附，但如果不完全在外面，就稍微彈回原處或只是停在該處)
-                    // 這裡簡單處理：如果沒對準，標記為未放入 (除非它其實在外面)
                     draggedItem.isInside = false;
-                    uiFeedback.innerText = "無法放置：空間不足或重疊！";
+                    uiFeedback.innerText = "空間不足或重疊！";
                     uiFeedback.style.color = "red";
                 }
 
                 updateStats();
                 draggedItem = null;
                 draw();
-                
                 setTimeout(() => {
                    uiFeedback.style.color = "#555"; 
                    if(!draggedItem) uiFeedback.innerText = "請拖曳物品放入背包";
                 }, 2000);
             }
-        });
+        }
 
-        // 按鈕功能
+        // 滑鼠事件
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('mousemove', handleMove);
+        canvas.addEventListener('mouseup', handleEnd);
+        
+        // 觸控事件 (新增，支援 iPad/手機)
+        canvas.addEventListener('touchstart', handleStart, {passive: false});
+        canvas.addEventListener('touchmove', handleMove, {passive: false});
+        canvas.addEventListener('touchend', handleEnd);
+
         document.getElementById('btn-spawn').addEventListener('click', () => {
             spawnItem();
             uiFeedback.innerText = "新物品已送達！";
@@ -400,12 +386,10 @@
             updateStats();
             draw();
             uiFeedback.innerText = "背包已清空";
-            uiItemInfo.innerHTML = "選取物品來查看乘法算式";
+            uiItemInfo.innerHTML = "點擊物品查看算式";
         });
 
-        // 啟動
         init();
-
     </script>
 </body>
 </html>
