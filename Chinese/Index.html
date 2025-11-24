@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>五行手寫對戰遊戲（HanziLookupJS 版）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 手寫辨識：HanziLookupJS（需搭配 mmah.json） -->
+  <script src="hanzilookup.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f4f5fb;
+      color: #222;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    .game-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 1rem;
+    }
+
+    .hp-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .hp-box {
+      flex: 1 1 150px;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      background: #f7f7ff;
+    }
+
+    .hp-title {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .hp-value {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .hp-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e0e0f0;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+
+    .hp-bar-inner {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #4caf50, #ff9800);
+      transition: width 0.3s;
+    }
+
+    .main-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .left-panel, .right-panel {
+      flex: 1 1 260px;
+    }
+
+    .canvas-wrapper {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      padding: 0.5rem;
+    }
+
+    .canvas-title {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    canvas {
+      width: 100%;
+      height: 220px;
+      border-radius: 6px;
+      background: #ffffff;
+      touch-action: none;
+      border: 1px solid #ddd;
+    }
+
+    .controls {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #3f51b5;
+      color: white;
+      min-width: 100px;
+    }
+
+    button.secondary {
+      background: #9e9e9e;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .info-panel {
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      background: #f9fafc;
+      border: 1px solid #e0e3ff;
+      font-size: 0.85rem;
+    }
+
+    .info-panel h2 {
+      font-size: 1rem;
+      margin-top: 0;
+    }
+
+    .log {
+      margin-top: 0.75rem;
+      height: 220px;
+      overflow-y: auto;
+      padding: 0.5rem;
+      background: #101322;
+      color: #e0e0ff;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+    }
+
+    .log-line {
+      margin-bottom: 0.25rem;
+      white-space: pre-wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #e8eaf6;
+      color: #303f9f;
+      margin-left: 4px;
+    }
+
+    .footer-hint {
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: #777;
+    }
+
+    .status {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #555;
+      min-height: 1.2em;
+    }
+
+    .status span {
+      font-weight: bold;
+    }
+
+    .timer {
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+      color: #c62828;
+      font-weight: bold;
+      min-height: 1.2em;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.2rem;
+      }
+      .subtitle {
+        font-size: 0.8rem;
+      }
+      button {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>五行手寫對戰遊戲（HanziLookupJS 版）</h1>
+    <div class="subtitle">每回合 5 秒內在畫布手寫一個字 → 本地手寫辨識 → 玩家先攻、NPC 後攻</div>
+
+    <div class="hp-row">
+      <div class="hp-box">
+        <div class="hp-title">玩家 HP</div>
+        <div class="hp-value" id="playerHpText">100 / 100</div>
+        <div class="hp-bar"><div class="hp-bar-inner" id="playerHpBar"></div></div>
+      </div>
+      <div class="hp-box">
+        <div class="hp-title">NPC HP</div>
+        <div class="hp-value" id="enemyHpText">100 / 100</div>
+        <div class="hp-bar"><div class="hp-bar-inner" id="enemyHpBar"></div></div>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <!-- 左側：畫布＋操作 -->
+      <div class="left-panel">
+        <div class="canvas-wrapper">
+          <div class="canvas-title">在這裡手寫你要使用的「字」</div>
+          <canvas id="drawCanvas"></canvas>
+          <div class="controls">
+            <button id="startTurnBtn">開始回合（5 秒倒數）</button>
+            <button id="clearCanvasBtn" class="secondary">清除畫布</button>
+            <button id="restartBtn" class="secondary">重新開始戰鬥</button>
+          </div>
+          <div class="timer" id="timerText"></div>
+          <div class="status" id="statusText"></div>
+        </div>
+      </div>
+
+      <!-- 右側：說明＋戰況 -->
+      <div class="right-panel">
+        <div class="info-panel">
+          <h2>規則摘要</h2>
+          <p>1. 每回合流程：</p>
+          <ul>
+            <li>按「開始回合」後開始倒數 <strong>5 秒</strong></li>
+            <li>5 秒內在畫布上手寫一個字（筆畫越多攻擊越高）</li>
+            <li>時間到 → 讀取你的筆畫軌跡，使用 HanziLookupJS 做手寫辨識</li>
+            <li>辨識出的字決定攻擊力與五行屬性</li>
+            <li>玩家攻擊完後，NPC 才會反擊</li>
+          </ul>
+          <p>2. 攻擊力計算：</p>
+          <ul>
+            <li><strong>攻擊力 = 筆畫數 × 五行相剋倍率</strong></li>
+            <li>只看筆畫數，不看帥度、不看角色設定</li>
+          </ul>
+          <p>3. 五行相剋（有剋到才 1.2 倍，其他 1.0 倍）：</p>
+          <ul>
+            <li>金剋木、木剋土、土剋水、水剋火、火剋金</li>
+          </ul>
+          <p>4. 辨識不到有效中文字 → 本回合玩家攻擊失敗，仍會被 NPC 打。</p>
+          <p>
+            <span class="badge">建議測試字</span>
+            火、炎、水、河、木、林、森、草、花、金、鋼、土、岩…
+          </p>
+        </div>
+        <div class="log" id="log"></div>
+        <div class="footer-hint">
+          本版完全使用本地手寫辨識（HanziLookupJS），不用 Cloud Vision、不需輸入字，也沒有 API 金額問題。<br>
+          後續可以再串劇情、等級、裝備、教學關卡等系統。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*********************************
+     * 1. HanziLookupJS 初始化
+     *********************************/
+    let hanziReady = false;
+    let hanziMatcher = null;
+
+    function initHanziLookup() {
+      // 使用 mmah 資料檔（Make Me a Hanzi）
+      HanziLookup.init("mmah", "mmah.json", function (success) {
+        if (!success) {
+          statusText.textContent = "❌ 手寫辨識字庫載入失敗，請檢查 mmah.json 路徑。";
+          return;
+        }
+        hanziMatcher = new HanziLookup.Matcher("mmah");
+        hanziReady = true;
+        logLine("📚 手寫辨識字庫載入完成，可以開始戰鬥。");
+      });
+    }
+
+    /*********************************
+     * 2. 字庫與五行設定（只看筆畫數）
+     *********************************/
+    const CHAR_DATA = {
+      // 火系
+      "火": { strokes: 4, element: "fire" },
+      "炎": { strokes: 8, element: "fire" },
+      "焰": { strokes: 11, element: "fire" },
+
+      // 水系
+      "水": { strokes: 4, element: "water" },
+      "河": { strokes: 8, element: "water" },
+      "湖": { strokes: 12, element: "water" },
+      "冰": { strokes: 6, element: "water" },
+
+      // 木系
+      "木": { strokes: 4, element: "wood" },
+      "林": { strokes: 8, element: "wood" },
+      "森": { strokes: 12, element: "wood" },
+      "草": { strokes: 9, element: "wood" },
+      "花": { strokes: 7, element: "wood" },
+
+      // 金系
+      "金": { strokes: 8, element: "metal" },
+      "針": { strokes: 10, element: "metal" },
+      "鋼": { strokes: 16, element: "metal" },
+
+      // 土系
+      "土": { strokes: 3, element: "earth" },
+      "地": { strokes: 6, element: "earth" },
+      "岩": { strokes: 8, element: "earth" }
+    };
+
+    const ELEMENT_NAMES = {
+      metal: "金",
+      wood: "木",
+      water: "水",
+      fire: "火",
+      earth: "土",
+      none: "無屬性"
+    };
+
+    function elementToText(elem) {
+      return ELEMENT_NAMES[elem] || "無屬性";
+    }
+
+    // 五行相剋倍率：只有「剋到」1.2，其餘 1.0
+    function getElementMultiplier(attElem, defElem) {
+      if (!attElem || !defElem) return 1.0;
+      if (attElem === "metal" && defElem === "wood") return 1.2;
+      if (attElem === "wood"  && defElem === "earth") return 1.2;
+      if (attElem === "earth" && defElem === "water") return 1.2;
+      if (attElem === "water" && defElem === "fire") return 1.2;
+      if (attElem === "fire"  && defElem === "metal") return 1.2;
+      return 1.0;
+    }
+
+    function getCharInfo(ch) {
+      if (CHAR_DATA[ch]) {
+        return CHAR_DATA[ch];
+      }
+      // 不在字庫：當 5 畫、無屬性（之後可改成查教育部資料）
+      return { strokes: 5, element: "none" };
+    }
+
+    /*********************************
+     * 3. 戰鬥狀態與邏輯
+     *********************************/
+    const MAX_HP = 100;
+    let playerHp = MAX_HP;
+    let enemyHp  = MAX_HP;
+    let isBattleOver = false;
+
+    // 回合狀態：idle / writing / resolving
+    let turnState = "idle";
+    const TURN_TIME_LIMIT = 5; // 秒
+    let timeLeft = TURN_TIME_LIMIT;
+    let timerId = null;
+
+    const playerHpText = document.getElementById("playerHpText");
+    const enemyHpText  = document.getElementById("enemyHpText");
+    const playerHpBar  = document.getElementById("playerHpBar");
+    const enemyHpBar   = document.getElementById("enemyHpBar");
+    const logEl        = document.getElementById("log");
+    const startTurnBtn = document.getElementById("startTurnBtn");
+    const restartBtn   = document.getElementById("restartBtn");
+    const clearCanvasBtn = document.getElementById("clearCanvasBtn");
+    const statusText   = document.getElementById("statusText");
+    const timerText    = document.getElementById("timerText");
+
+    function updateHpUI() {
+      playerHpText.textContent = `${playerHp} / ${MAX_HP}`;
+      enemyHpText.textContent  = `${enemyHp} / ${MAX_HP}`;
+      playerHpBar.style.width = Math.max(0, (playerHp / MAX_HP) * 100) + "%";
+      enemyHpBar.style.width  = Math.max(0, (enemyHp / MAX_HP) * 100) + "%";
+    }
+
+    function logLine(text) {
+      const div = document.createElement("div");
+      div.className = "log-line";
+      div.textContent = text;
+      logEl.appendChild(div);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function randomEnemyChar() {
+      const keys = Object.keys(CHAR_DATA);
+      const idx = Math.floor(Math.random() * keys.length);
+      return keys[idx];
+    }
+
+    function calcDamage(attChar, defChar) {
+      const attInfo = getCharInfo(attChar);
+      const defInfo = getCharInfo(defChar);
+      const baseATK = attInfo.strokes; // 只看筆畫數
+      const multiplier = getElementMultiplier(attInfo.element, defInfo.element);
+      const damage = Math.round(baseATK * multiplier);
+      return Math.max(damage, 1);
+    }
+
+    function endBattle(winner) {
+      isBattleOver = true;
+      turnState = "idle";
+      stopTurnTimer();
+      startTurnBtn.disabled = true;
+
+      let text = "";
+      if (winner === "player") {
+        text = "✅ 戰鬥結束：玩家勝利！";
+      } else if (winner === "enemy") {
+        text = "❌ 戰鬥結束：玩家被打倒了…";
+      } else {
+        text = "⚖ 戰鬥結束：平手。";
+      }
+      logLine(text);
+      statusText.textContent = text;
+      timerText.textContent = "";
+    }
+
+    function restartBattle() {
+      playerHp = MAX_HP;
+      enemyHp  = MAX_HP;
+      isBattleOver = false;
+      turnState = "idle";
+      stopTurnTimer();
+      timerText.textContent = "";
+      statusText.textContent = "";
+      logEl.innerHTML = "";
+      updateHpUI();
+      clearCanvas();
+      startTurnBtn.disabled = false;
+      logLine("✨ 戰鬥開始！等字庫載入完成後，按「開始回合」在 5 秒內寫出一個字。");
+    }
+
+    function startTurn() {
+      if (isBattleOver) return;
+      if (!hanziReady) {
+        statusText.textContent = "請等字庫載入完成再開始（下方 log 會顯示完成訊息）。";
+        return;
+      }
+      if (turnState !== "idle") return;
+
+      turnState = "writing";
+      timeLeft = TURN_TIME_LIMIT;
+      statusText.textContent = "請在 5 秒內寫一個字！時間到會自動送出。";
+      timerText.textContent = `剩餘時間：${timeLeft} 秒`;
+      clearCanvas();
+      canDraw = true;
+
+      startTurnBtn.disabled = true; // 避免連按
+      stopTurnTimer();
+      timerId = setInterval(() => {
+        timeLeft -= 1;
+        if (timeLeft <= 0) {
+          timerText.textContent = `時間到！正在辨識…`;
+          stopTurnTimer();
+          canDraw = false;
+          resolveTurnAfterTimeout();
+        } else {
+          timerText.textContent = `剩餘時間：${timeLeft} 秒`;
+        }
+      }, 1000);
+    }
+
+    function stopTurnTimer() {
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    async function resolveTurnAfterTimeout() {
+      if (isBattleOver) return;
+      turnState = "resolving";
+      try {
+        statusText.textContent = "⌛ 正在進行手寫辨識…";
+
+        const playerChar = await recognizeCharacterFromStrokes();
+        const enemyChar = randomEnemyChar();
+        const pInfo = getCharInfo(playerChar);
+        const eInfo = getCharInfo(enemyChar);
+
+        // 玩家攻擊
+        const damageToEnemy = calcDamage(playerChar, enemyChar);
+        enemyHp = Math.max(0, enemyHp - damageToEnemy);
+        logLine(
+          `🧑 玩家用「${playerChar}」（${pInfo.strokes} 畫，${elementToText(pInfo.element)}）攻擊 ` +
+          `👾 NPC 的「${enemyChar}」（${eInfo.strokes} 畫，${elementToText(eInfo.element)}），造成 ${damageToEnemy} 傷害！`
+        );
+        updateHpUI();
+
+        if (enemyHp <= 0) {
+          endBattle("player");
+          return;
+        }
+
+        // NPC 反擊
+        const damageToPlayer = calcDamage(enemyChar, playerChar);
+        playerHp = Math.max(0, playerHp - damageToPlayer);
+        logLine(`👾 NPC 用「${enemyChar}」反擊，對玩家造成 ${damageToPlayer} 傷害！`);
+        updateHpUI();
+
+        if (playerHp <= 0) {
+          endBattle("enemy");
+          return;
+        }
+
+        statusText.textContent = `本回合結束：你用「${playerChar}」，NPC 用「${enemyChar}」。`;
+      } catch (err) {
+        console.error(err);
+        // 辨識失敗：玩家攻擊落空，NPC 仍然攻擊
+        const enemyChar = randomEnemyChar();
+        const eInfo = getCharInfo(enemyChar);
+        // 以「無屬性 5 畫」當作玩家防守
+        const damageToPlayer = calcDamage(enemyChar, "");
+        playerHp = Math.max(0, playerHp - damageToPlayer);
+        logLine("⚠️ 手寫辨識失敗，玩家本回合攻擊落空。");
+        logLine(
+          `👾 NPC 抓準機會，用「${enemyChar}」（${eInfo.strokes} 畫，${elementToText(eInfo.element)}）攻擊玩家，造成 ${damageToPlayer} 傷害！`
+        );
+        updateHpUI();
+
+        if (playerHp <= 0) {
+          endBattle("enemy");
+          return;
+        }
+
+        statusText.textContent = "本回合結束：辨識失敗，下回合請寫得更清楚一點。";
+      } finally {
+        if (!isBattleOver) {
+          turnState = "idle";
+          startTurnBtn.disabled = false;
+          timerText.textContent = "";
+        }
+      }
+    }
+
+    /*********************************
+     * 4. 使用 HanziLookupJS 做「真手寫」辨識
+     *********************************/
+    async function recognizeCharacterFromStrokes() {
+      if (!hanziReady || !hanziMatcher) {
+        throw new Error("字庫尚未載入完成");
+      }
+      if (!strokes.length) {
+        throw new Error("畫布上沒有任何筆畫");
+      }
+
+      // HanziLookup.AnalyzedCharacter 需要「陣列的筆畫」，每筆畫是一串 [x, y] 點
+      const analyzedChar = new HanziLookup.AnalyzedCharacter(strokes);
+
+      return new Promise((resolve, reject) => {
+        hanziMatcher.match(analyzedChar, 1, function (matches) {
+          if (!matches || matches.length === 0) {
+            reject(new Error("沒有候選字"));
+            return;
+          }
+          const best = matches[0];
+          if (!best.character) {
+            reject(new Error("辨識結果無效"));
+            return;
+          }
+          resolve(best.character);
+        });
+      });
+    }
+
+    /*********************************
+     * 5. 畫布（手寫區）＋筆畫紀錄
+     *********************************/
+    const canvas = document.getElementById("drawCanvas");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let canDraw = true;
+
+    // strokes = [ stroke1, stroke2, ... ]
+    // stroke = [ [x1, y1], [x2, y2], ... ]
+    let strokes = [];
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width  = rect.width * ratio;
+      canvas.height = rect.height * ratio;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      clearCanvas();
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#000000";
+      strokes = [];
+    }
+
+    function getPos(e) {
+      if (e.touches && e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        return {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        };
+      } else {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      }
+    }
+
+    function startDraw(e) {
+      if (!canDraw || turnState !== "writing") return;
+      e.preventDefault();
+      drawing = true;
+      const pos = getPos(e);
+      lastX = pos.x;
+      lastY = pos.y;
+
+      // 新的一筆畫
+      const stroke = [];
+      stroke.push([pos.x, pos.y]);
+      strokes.push(stroke);
+    }
+
+    function moveDraw(e) {
+      if (!drawing || !canDraw || turnState !== "writing") return;
+      e.preventDefault();
+      const pos = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+      lastX = pos.x;
+      lastY = pos.y;
+
+      // 在當前 stroke 加入新點
+      if (strokes.length > 0) {
+        const currentStroke = strokes[strokes.length - 1];
+        currentStroke.push([pos.x, pos.y]);
+      }
+    }
+
+    function endDraw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      drawing = false;
+    }
+
+    canvas.addEventListener("mousedown", startDraw);
+    canvas.addEventListener("mousemove", moveDraw);
+    canvas.addEventListener("mouseup", endDraw);
+    canvas.addEventListener("mouseleave", endDraw);
+
+    canvas.addEventListener("touchstart", startDraw, { passive: false });
+    canvas.addEventListener("touchmove",  moveDraw,   { passive: false });
+    canvas.addEventListener("touchend",   endDraw,    { passive: false });
+    canvas.addEventListener("touchcancel",endDraw,    { passive: false });
+
+    window.addEventListener("resize", resizeCanvas);
+
+    /*********************************
+     * 6. 事件綁定與初始化
+     *********************************/
+    startTurnBtn.addEventListener("click", startTurn);
+    restartBtn.addEventListener("click", restartBattle);
+    clearCanvasBtn.addEventListener("click", () => {
+      if (turnState === "idle" || turnState === "writing") {
+        clearCanvas();
+      }
+    });
+
+    // 初始化
+    resizeCanvas();
+    restartBattle();
+    initHanziLookup();
+  </script>
+</body>
+</html>
