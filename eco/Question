@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>減塑行動互動問答</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #e0f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #ffffff;
+      max-width: 600px;
+      width: 90%;
+      padding: 20px 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+    .intro {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 12px;
+    }
+    .input-row {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+    .question-box {
+      margin-top: 12px;
+    }
+    .question-title {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .question-text {
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-btn {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #00796b;
+      background: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .option-btn:hover {
+      background: #e0f2f1;
+      transform: translateY(-1px);
+    }
+    .option-selected {
+      background: #00796b;
+      color: #ffffff;
+    }
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    button.primary {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #00796b;
+      color: #ffffff;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    button.primary:disabled {
+      background: #999999;
+      cursor: not-allowed;
+    }
+    .progress {
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .result-box {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #e0f2f1;
+      font-size: 0.95rem;
+    }
+    .status {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>減塑行動｜海洋守護小測驗</h1>
+    <p class="intro">
+      請依照你的真實想法作答，完成後會看到你比較像哪一種「發展與保育」類型，
+      並會匿名記錄到系統中作為教學研究使用。
+    </p>
+
+    <div class="input-row">
+      <label for="userName">暱稱 / 座號（可選填）</label>
+      <input type="text" id="userName" placeholder="例如：3 號小明、Lily…" />
+    </div>
+
+    <div id="quizArea">
+      <!-- 題目會用 JS 動態塞進來 -->
+    </div>
+
+    <div class="actions">
+      <div class="progress" id="progressText">第 1 / 5 題</div>
+      <button class="primary" id="nextBtn" disabled>下一題</button>
+    </div>
+
+    <div class="result-box" id="resultBox" style="display:none;"></div>
+    <div class="status" id="statusText"></div>
+  </div>
+
+  <script>
+    // TODO：把這裡換成你實際部署的 GAS Web App URL
+    const GAS_URL = "https://script.google.com/macros/s/XXXXXXXXXXXXXXXX/exec";
+
+    // 題目設定（你可以依需求改文字）
+    const questions = [
+      {
+        text: "你希望環境的經濟發展如何？",
+        options: [
+          { text: "越賺錢越好，商業活動優先", value: 1 }, // 類型 1 傾向
+          { text: "不用太賺錢，但環境要保持乾淨", value: 0 } // 類型 3 傾向
+        ]
+      },
+      {
+        text: "如果海邊能蓋一個很賺錢的商場，你會希望？",
+        options: [
+          { text: "蓋！有賺錢最重要", value: 1 },
+          { text: "先不要，讓海洋動物安全比較重要", value: 0 }
+        ]
+      },
+      {
+        text: "你今天買飲料，店家問你封膜或自帶杯，你會選？",
+        options: [
+          { text: "封膜最快、最方便", value: 1 },
+          { text: "自帶杯比較不會製造垃圾", value: 0 }
+        ]
+      },
+      {
+        text: "班級戶外教學要選交通工具，你偏好？",
+        options: [
+          { text: "遊覽車，最不累最省時", value: 1 },
+          { text: "步行或捷運，減少排放比較好", value: 0 }
+        ]
+      },
+      {
+        text: "如果你撿到一個還能用的塑膠袋，你會？",
+        options: [
+          { text: "丟掉，反正很便宜", value: 1 },
+          { text: "留下來重複使用", value: 0 }
+        ]
+      }
+    ];
+
+    let currentIndex = 0;
+    let answers = []; // 紀錄 0/1
+    let selectedValue = null;
+    let startTime = Date.now();
+    const sessionId = "sess_" + Math.random().toString(36).slice(2);
+
+    const quizArea = document.getElementById("quizArea");
+    const progressText = document.getElementById("progressText");
+    const nextBtn = document.getElementById("nextBtn");
+    const resultBox = document.getElementById("resultBox");
+    const statusText = document.getElementById("statusText");
+    const userNameInput = document.getElementById("userName");
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      quizArea.innerHTML = "";
+
+      const qBox = document.createElement("div");
+      qBox.className = "question-box";
+
+      const title = document.createElement("div");
+      title.className = "question-title";
+      title.textContent = "第 " + (currentIndex + 1) + " 題";
+
+      const qText = document.createElement("div");
+      qText.className = "question-text";
+      qText.textContent = q.text;
+
+      const optionsDiv = document.createElement("div");
+      optionsDiv.className = "options";
+
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.text;
+        btn.addEventListener("click", () => {
+          selectedValue = opt.value;
+          // UI 標記被選中
+          Array.from(optionsDiv.children).forEach(c => c.classList.remove("option-selected"));
+          btn.classList.add("option-selected");
+          nextBtn.disabled = false;
+        });
+        optionsDiv.appendChild(btn);
+      });
+
+      qBox.appendChild(title);
+      qBox.appendChild(qText);
+      qBox.appendChild(optionsDiv);
+      quizArea.appendChild(qBox);
+
+      progressText.textContent = "第 " + (currentIndex + 1) + " / " + questions.length + " 題";
+      nextBtn.textContent = currentIndex === questions.length - 1 ? "看結果" : "下一題";
+      nextBtn.disabled = true;
+      selectedValue = null;
+      resultBox.style.display = "none";
+      statusText.textContent = "";
+    }
+
+    function calcType(answers) {
+      // answers 是 0/1，統計選 1 的次數
+      const count1 = answers.filter(v => v === 1).length;
+      let type, desc;
+      if (count1 >= 4) {
+        type = 1;
+        desc = "你偏向「高經濟發展，生物逐漸受害」類型，重視方便與賺錢，對減塑與保育的要求較低。";
+      } else if (count1 >= 2) {
+        type = 2;
+        desc = "你偏向「偶爾環保，態度中間」類型，有時會為環境做選擇，但也常為了方便而妥協。";
+      } else {
+        type = 3;
+        desc = "你偏向「低發展但生物保育優良」類型，願意為海洋生物與環境品質做出取捨。";
+      }
+      return { type, desc, count1 };
+    }
+
+    async function submitToGAS(result) {
+      const timeUsedMs = Date.now() - startTime;
+      const payload = {
+        sessionId: sessionId,
+        userName: userNameInput.value || "",
+        answers: answers,     // 例如 [1,0,1,0,1]
+        type: result.type,    // 1 / 2 / 3
+        timeUsedMs: timeUsedMs
+      };
+
+      statusText.textContent = "資料上傳中…";
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain" // 用 text/plain 避免 CORS preflight 問題
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.status === "ok") {
+          statusText.textContent = "✅ 作答紀錄已送出。";
+        } else {
+          statusText.textContent = "⚠️ 上傳失敗（但你的結果已在這個頁面顯示）。";
+        }
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = "⚠️ 上傳時發生錯誤（但你的結果已在這個頁面顯示）。";
+      }
+    }
+
+    function showResult() {
+      const result = calcType(answers);
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `
+        <div><strong>你的類型：第 ${result.type} 類</strong></div>
+        <div style="margin-top:6px;">${result.desc}</div>
+      `;
+      // 送到 GAS
+      submitToGAS(result);
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (selectedValue === null) return;
+      answers[currentIndex] = selectedValue;
+
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        // 完成所有題目
+        quizArea.innerHTML = "";
+        progressText.textContent = "已完成所有題目";
+        nextBtn.disabled = true;
+        showResult();
+      }
+    });
+
+    // 初始化
+    renderQuestion();
+  </script>
+</body>
+</html>
