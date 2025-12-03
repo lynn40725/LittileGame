@@ -151,6 +151,13 @@
     // TODO：把這裡換成你實際部署的 GAS Web App URL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxC-OG6rbAwSCzoQESEiQeLpLyI39_nh54McjWfhSC0Z5O9brTUXMvwaqxk32q7CrVT/exec";
 
+// 依「結果一 / 結果二 / 結果三」設定對應圖片
+// 請把這三個網址換成你自己的（結果一、結果二、結果三）
+const RESULT_IMAGE_URLS = {
+  1: "https://drive.google.com/uc?export=view&id=結果一的FILE_ID", // 結果一
+  2: "https://drive.google.com/uc?export=view&id=結果二的FILE_ID", // 結果二
+  3: "https://drive.google.com/uc?export=view&id=結果三的FILE_ID"  // 結果三
+};
     // 題目設定（你可以依需求改文字）
     const questions = [
       {
@@ -299,16 +306,29 @@
     }
 
     function showResult() {
-      const result = calcType(answers);
-      resultBox.style.display = "block";
-      resultBox.innerHTML = `
-        <div><strong>你的類型：第 ${result.type} 類</strong></div>
-        <div style="margin-top:6px;">${result.desc}</div>
-      `;
-      // 送到 GAS
-      submitToGAS(result);
-    }
+  const result = calcType(answers);
+  const imgUrl = RESULT_IMAGE_URLS[result.type];
 
+  let imgHtml = "";
+  if (imgUrl) {
+    imgHtml = `
+      <div style="margin-top:8px; text-align:center;">
+        <img src="${imgUrl}" alt="結果${result.type} 圖片"
+             style="max-width:100%; border-radius:12px;"/>
+      </div>
+    `;
+  }
+
+  resultBox.style.display = "block";
+  resultBox.innerHTML = `
+    <div><strong>你的類型：第 ${result.type} 類</strong></div>
+    <div style="margin-top:6px;">${result.desc}</div>
+    ${imgHtml}
+  `;
+
+  // 送到 GAS
+  submitToGAS(result);
+}
     nextBtn.addEventListener("click", () => {
       if (selectedValue === null) return;
       answers[currentIndex] = selectedValue;
