@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>在 Steam 上，你是哪一種買遊戲演算法玩家？</title>
+  <title>你是哪一種買遊戲演算法玩家？</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -13,8 +13,8 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       padding: 1.5rem;
-      background: #0f172a;
-      color: #e5e7eb;
+      background: #f5f5f5;
+      color: #1f2937;
       display: flex;
       justify-content: center;
     }
@@ -22,21 +22,21 @@
     .container {
       width: 100%;
       max-width: 900px;
-      background: #020617;
+      background: #ffffff;
       border-radius: 1rem;
       padding: 1.5rem 1.75rem 2rem;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
-      border: 1px solid #1f2937;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      border: 1px solid #ddd;
     }
 
     h1 {
       font-size: 1.8rem;
       margin-bottom: 0.5rem;
-      color: #f9fafb;
+      color: #111827;
     }
 
     .subtitle {
-      color: #9ca3af;
+      color: #374151;
       margin-bottom: 1.25rem;
       line-height: 1.6;
     }
@@ -45,8 +45,8 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      background: rgba(96, 165, 250, 0.1);
-      color: #bfdbfe;
+      background: #e0f2fe;
+      color: #0369a1;
       border-radius: 999px;
       padding: 0.2rem 0.75rem;
       font-size: 0.8rem;
@@ -60,22 +60,22 @@
     }
 
     .question-card {
-      background: #020617;
+      background: #fafafa;
       border-radius: 0.85rem;
       padding: 0.9rem 1rem;
-      border: 1px solid #111827;
+      border: 1px solid #e5e7eb;
     }
 
     .question-title {
       font-weight: 600;
       margin-bottom: 0.15rem;
-      color: #e5e7eb;
+      color: #111827;
       font-size: 1rem;
     }
 
     .question-desc {
       font-size: 0.85rem;
-      color: #9ca3af;
+      color: #4b5563;
       margin-bottom: 0.4rem;
       line-height: 1.5;
     }
@@ -94,14 +94,14 @@
 
     .range-row input[type="range"] {
       flex: 1;
-      accent-color: #60a5fa;
+      accent-color: #2563eb;
     }
 
     .range-value {
       min-width: 2rem;
       text-align: center;
       font-weight: 600;
-      color: #bfdbfe;
+      color: #1d4ed8;
       font-size: 0.9rem;
     }
 
@@ -109,7 +109,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.75rem;
-      color: #4b5563;
+      color: #6b7280;
       margin-top: 0.2rem;
     }
 
@@ -122,28 +122,26 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      background: linear-gradient(135deg, #60a5fa, #a855f7);
-      color: #020617;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.1s ease;
-      box-shadow: 0 12px 25px rgba(59, 130, 246, 0.45);
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: white;
+      transition: 0.15s ease;
+      box-shadow: 0 6px 15px rgba(99, 102, 241, 0.35);
     }
 
     button#calculateBtn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 16px 30px rgba(59, 130, 246, 0.7);
-      opacity: 0.95;
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.45);
     }
 
     button#calculateBtn:active {
       transform: translateY(1px);
-      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.6);
-      opacity: 0.9;
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
     }
 
     .result-section {
       margin-top: 1.75rem;
       padding-top: 1.25rem;
-      border-top: 1px solid #111827;
+      border-top: 1px solid #e5e7eb;
       display: none;
     }
 
@@ -161,28 +159,20 @@
       margin-bottom: 0.35rem;
     }
 
-    .result-title.greedy {
-      color: #fbbf24;
-    }
-
-    .result-title.dp {
-      color: #34d399;
-    }
-
-    .result-title.knn {
-      color: #60a5fa;
-    }
+    .result-title.greedy { color: #d97706; }
+    .result-title.dp { color: #059669; }
+    .result-title.knn { color: #2563eb; }
 
     .result-desc {
       font-size: 0.92rem;
-      color: #d1d5db;
+      color: #374151;
       line-height: 1.7;
       margin-bottom: 0.75rem;
     }
 
     .result-extra {
       font-size: 0.85rem;
-      color: #9ca3af;
+      color: #4b5563;
       line-height: 1.6;
     }
 
@@ -198,247 +188,169 @@
     .score-pill {
       padding: 0.15rem 0.6rem;
       border-radius: 999px;
-      background: #020617;
-      border: 1px solid #111827;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 1.1rem 1.1rem 1.5rem;
-      }
-
-      h1 {
-        font-size: 1.4rem;
-      }
-
-      .question-card {
-        padding: 0.8rem 0.85rem;
-      }
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <div class="badge">
-      🎮 在 Steam 上，你怎麼決定要買哪一款？
-    </div>
+    <div class="badge">🎮 在 Steam 上，你怎麼決定要買哪一款？</div>
     <h1>你是哪一種「買遊戲演算法」玩家？</h1>
+
     <p class="subtitle">
-      想像你正打開 Steam，願望清單滿滿一整頁。<br />
-      用直覺回答下面幾題，我們會幫你分類：你比較像
+      想像你正打開 Steam，願望清單滿滿一整頁。  
+      用直覺回答下面幾題，我們會幫你分類：
       <strong>貪婪演算法玩家</strong>、
-      <strong>動態規劃玩家</strong>，還是
-      <strong>KNN（看鄰居）玩家</strong>？
+      <strong>動態規劃玩家</strong>，或
+      <strong>KNN（看鄰居）玩家</strong>！
     </p>
 
     <div class="questions">
+
       <!-- Q1 -->
       <div class="question-card">
         <div class="question-title">Q1. 你有多在意「立刻玩到」？</div>
-        <div class="question-desc">
-          如果看到一款超想玩的新遊戲，你會多想要<strong>現在立刻就買來玩</strong>？
-        </div>
+        <div class="question-desc">看到一款喜歡的新遊戲，你會多想要<strong>立刻買來玩</strong>？</div>
         <div class="range-row">
-          <span class="label">完全不急</span>
-          <input type="range" id="q1" min="1" max="10" value="5" />
-          <span class="label">一定要現在</span>
+          <span class="label">不急</span>
+          <input type="range" id="q1" min="1" max="10" value="5">
+          <span class="label">現在就要</span>
           <div class="range-value" data-for="q1">5</div>
-        </div>
-        <div class="hint-row">
-          <span>1：慢慢等也可以</span>
-          <span>10：看到就想直接下單！</span>
         </div>
       </div>
 
       <!-- Q2 -->
       <div class="question-card">
         <div class="question-title">Q2. 你有多在意折扣跟史低？</div>
-        <div class="question-desc">
-          你在意這款遊戲是不是特價、是不是史低價嗎？
-        </div>
+        <div class="question-desc">你會查價格紀錄、等史低嗎？</div>
         <div class="range-row">
-          <span class="label">不看折扣</span>
-          <input type="range" id="q2" min="1" max="10" value="5" />
-          <span class="label">一定查史低</span>
+          <span class="label">不會</span>
+          <input type="range" id="q2" min="1" max="10" value="5">
+          <span class="label">一定要查</span>
           <div class="range-value" data-for="q2">5</div>
-        </div>
-        <div class="hint-row">
-          <span>1：完全不看折扣</span>
-          <span>10：一定會查歷史價格，沒史低不買</span>
         </div>
       </div>
 
       <!-- Q3 -->
       <div class="question-card">
         <div class="question-title">Q3. 朋友在玩對你有多大影響？</div>
-        <div class="question-desc">
-          你的朋友們最近都在玩某款遊戲，你會因此比較想買嗎？
-        </div>
+        <div class="question-desc">朋友都在玩會讓你跟著買嗎？</div>
         <div class="range-row">
           <span class="label">完全不會</span>
-          <input type="range" id="q3" min="1" max="10" value="5" />
-          <span class="label">超級有影響</span>
+          <input type="range" id="q3" min="1" max="10" value="5">
+          <span class="label">超級會</span>
           <div class="range-value" data-for="q3">5</div>
-        </div>
-        <div class="hint-row">
-          <span>1：朋友玩什麼不重要</span>
-          <span>10：朋友都在玩就會超想跟著買</span>
         </div>
       </div>
 
       <!-- Q4 -->
       <div class="question-card">
-        <div class="question-title">Q4. 你願意為了更划算的組合花時間規劃嗎？</div>
-        <div class="question-desc">
-          如果你有一筆預算，可以買好幾款遊戲，你願不願意花時間排出
-          「最划算的組合」？
-        </div>
+        <div class="question-title">Q4. 你願意花時間規劃最划算的組合嗎？</div>
+        <div class="question-desc">你會比價、開表單找「最優解」嗎？</div>
         <div class="range-row">
           <span class="label">懶得算</span>
-          <input type="range" id="q4" min="1" max="10" value="5" />
+          <input type="range" id="q4" min="1" max="10" value="5">
           <span class="label">會算到爆</span>
           <div class="range-value" data-for="q4">5</div>
-        </div>
-        <div class="hint-row">
-          <span>1：看到想玩的就隨緣買</span>
-          <span>10：會開表單或網站比半天才決定</span>
         </div>
       </div>
 
       <!-- Q5 -->
       <div class="question-card">
-        <div class="question-title">Q5. 預算壓力對你的重要程度？</div>
-        <div class="question-desc">
-          你覺得買遊戲時「預算限制」有多重要？
-        </div>
+        <div class="question-title">Q5. 預算限制對你重要嗎？</div>
+        <div class="question-desc">你會抓預算、做整體規劃嗎？</div>
         <div class="range-row">
-          <span class="label">沒那麼重要</span>
-          <input type="range" id="q5" min="1" max="10" value="5" />
-          <span class="label">非常重要</span>
+          <span class="label">不重要</span>
+          <input type="range" id="q5" min="1" max="10" value="5">
+          <span class="label">很重要</span>
           <div class="range-value" data-for="q5">5</div>
-        </div>
-        <div class="hint-row">
-          <span>1：先買再說，錢之後再想</span>
-          <span>10：會抓好每個月遊戲預算，不能超支</span>
         </div>
       </div>
 
       <!-- Q6 -->
       <div class="question-card">
-        <div class="question-title">Q6. 你會不會主動去查別人的評論跟評分？</div>
-        <div class="question-desc">
-          在買遊戲前，你會去看實況主、好友評論、Steam Review 嗎？
-        </div>
+        <div class="question-title">Q6. 你會查評論、看別人在玩嗎？</div>
+        <div class="question-desc">你會看 streamer 或 Steam 評論嗎？</div>
         <div class="range-row">
-          <span class="label">幾乎不會</span>
-          <input type="range" id="q6" min="1" max="10" value="5" />
-          <span class="label">一定會看</span>
+          <span class="label">不會</span>
+          <input type="range" id="q6" min="1" max="10" value="5">
+          <span class="label">一定會</span>
           <div class="range-value" data-for="q6">5</div>
         </div>
-        <div class="hint-row">
-          <span>1：看到喜歡就直接買</span>
-          <span>10：一定會看別人在玩什麼、怎麼說</span>
-        </div>
       </div>
+
     </div>
 
     <button id="calculateBtn">看結果</button>
 
     <div id="resultSection" class="result-section">
       <div class="result-tag">分析結果</div>
-      <div id="resultTitle" class="result-title">你是哪一種玩家？</div>
+      <div id="resultTitle" class="result-title"></div>
       <p id="resultDesc" class="result-desc"></p>
       <p id="resultExtra" class="result-extra"></p>
 
-      <div class="score-row" id="scoreRow">
-        <!-- 之後用 JS 填入三種分數 -->
-      </div>
+      <div class="score-row" id="scoreRow"></div>
     </div>
+
   </div>
 
   <script>
-    // 即時更新 slider 數字
-    const ranges = document.querySelectorAll('input[type="range"]');
-    ranges.forEach((range) => {
-      const valueSpan = document.querySelector(
-        '.range-value[data-for="' + range.id + '"]'
-      );
-      if (valueSpan) {
-        valueSpan.textContent = range.value;
-        range.addEventListener('input', () => {
-          valueSpan.textContent = range.value;
-        });
-      }
+    document.querySelectorAll('input[type="range"]').forEach(range => {
+      const span = document.querySelector(`.range-value[data-for="${range.id}"]`);
+      span.textContent = range.value;
+      range.addEventListener('input', () => span.textContent = range.value);
     });
 
-    const btn = document.getElementById('calculateBtn');
-    const resultSection = document.getElementById('resultSection');
-    const resultTitle = document.getElementById('resultTitle');
-    const resultDesc = document.getElementById('resultDesc');
-    const resultExtra = document.getElementById('resultExtra');
-    const scoreRow = document.getElementById('scoreRow');
+    document.getElementById("calculateBtn").addEventListener("click", () => {
+      const v = id => parseInt(document.getElementById(id).value);
+      const q1 = v("q1"), q2 = v("q2"), q3 = v("q3"), q4 = v("q4"), q5 = v("q5"), q6 = v("q6");
 
-    btn.addEventListener('click', () => {
-      const q1 = parseInt(document.getElementById('q1').value, 10);
-      const q2 = parseInt(document.getElementById('q2').value, 10);
-      const q3 = parseInt(document.getElementById('q3').value, 10);
-      const q4 = parseInt(document.getElementById('q4').value, 10);
-      const q5 = parseInt(document.getElementById('q5').value, 10);
-      const q6 = parseInt(document.getElementById('q6').value, 10);
+      const greedy = q1 + (11 - q4) + (11 - q5) + (11 - q6);
+      const dp = q2 + q4 + q5;
+      const knn = q3 + q6;
 
-      // 分數計算邏輯
-      const greedyScore = q1 + (11 - q4) + (11 - q5) + (11 - q6);
-      const dpScore = q2 + q4 + q5;
-      const knnScore = q3 + q6;
+      let type = "greedy", max = greedy;
+      if (dp >= max) { type = "dp"; max = dp; }
+      if (knn >= max) { type = "knn"; max = knn; }
 
-      let maxType = 'greedy';
-      let maxScore = greedyScore;
+      const title = document.getElementById("resultTitle");
+      title.classList.remove("greedy", "dp", "knn");
 
-      if (dpScore >= maxScore) {
-        maxType = 'dp';
-        maxScore = dpScore;
-      }
-      if (knnScore >= maxScore) {
-        maxType = 'knn';
-        maxScore = knnScore;
-      }
-
-      // 清掉舊的 class
-      resultTitle.classList.remove('greedy', 'dp', 'knn');
-
-      if (maxType === 'greedy') {
-        resultTitle.textContent = '你是：貪婪演算法型玩家';
-        resultTitle.classList.add('greedy');
-        resultDesc.innerHTML =
-          '買遊戲的時候，你最重視「當下看到的爽感」。看到想玩的就會直接買，比起多花時間比較價格，你更在意馬上能玩到。';
-        resultExtra.innerHTML =
-          '演算法對應來說，你的決策方式就像貪婪演算法：每一步都選「現在看起來最好的選項」，不回頭、不等未來。這非常適合衝動購物、首發衝玩家、或是看到喜歡的就想立刻支持的創作者。';
-      } else if (maxType === 'dp') {
-        resultTitle.textContent = '你是：動態規劃型玩家';
-        resultTitle.classList.add('dp');
-        resultDesc.innerHTML =
-          '你會看折扣、查史低，還會考慮預算和整體遊玩計畫。你會想：「如果這次特賣買 A+B 比買 C 更划算，那我要重新排一下組合。」';
-        resultExtra.innerHTML =
-          '演算法對應來說，你的做法就像動態規劃：把整體預算、折扣、遊戲價值都一起考慮，試圖找到「整體最優解」，而不是只看當下。你可能會開 Excel、查價格紀錄，或在各大平台之間瘋狂比價。';
+      if (type === "greedy") {
+        title.textContent = "你是：貪婪演算法型玩家";
+        title.classList.add("greedy");
+        resultDesc.textContent =
+          "你最重視「當下的爽感」。只要現在想玩，會立刻買下來，比起等待折扣或查史低，你更在意當下能不能玩到。";
+        resultExtra.textContent =
+          "你的行為就像貪婪演算法：每一步都選當下最好的選項，不回頭、不等未來。很適合喜歡衝首發、立即支持創作者的玩家。";
+      } else if (type === "dp") {
+        title.textContent = "你是：動態規劃型玩家";
+        title.classList.add("dp");
+        resultDesc.textContent =
+          "你會查折扣、查史低，也會考慮整體預算和遊玩規劃。你會想：「如果這次特賣買 A+B 更划算，那我要調整一下組合。」";
+        resultExtra.textContent =
+          "你的思考方式像動態規劃：整體評估所有選項，找出最優解。你可能會開表單、比價、查便宜平台，是最會省錢的玩家族群。";
       } else {
-        resultTitle.textContent = '你是：KNN（看鄰居）型玩家';
-        resultTitle.classList.add('knn');
-        resultDesc.innerHTML =
-          '對你來說，「跟誰一起玩」比玩什麼更重要。你很重視朋友在玩什麼、實況主在推什麼、評論怎麼說。';
-        resultExtra.innerHTML =
-          '演算法對應來說，KNN 是「看跟你最像的鄰居在做什麼」的演算法。你的行為就像用 KNN：找出跟你口味相似的玩家群，再跟著他們的選擇做決定。實況主、好友評論、社群討論，都是你重要的決策依據。';
+        title.textContent = "你是：KNN（看鄰居）型玩家";
+        title.classList.add("knn");
+        resultDesc.textContent =
+          "你很重視朋友在玩什麼、實況主推薦什麼、評論怎麼說。一起玩比玩什麼更重要。";
+        resultExtra.textContent =
+          "你的行為像 KNN：找出和你最相似的一群鄰居，再跟著他們做決定。你是最容易和朋友一起享受遊戲的玩家類型。";
       }
 
-      // 分數顯示
-      scoreRow.innerHTML = `
-        <div class="score-pill">貪婪分數 Greedy：${greedyScore}</div>
-        <div class="score-pill">動態規劃 DP：${dpScore}</div>
-        <div class="score-pill">KNN（看鄰居）：${knnScore}</div>
+      document.getElementById("scoreRow").innerHTML = `
+        <div class="score-pill">貪婪分數：${greedy}</div>
+        <div class="score-pill">動態規劃：${dp}</div>
+        <div class="score-pill">KNN：${knn}</div>
       `;
 
-      resultSection.style.display = 'block';
-      resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById("resultSection").style.display = "block";
+      document.getElementById("resultSection").scrollIntoView({ behavior: "smooth" });
     });
   </script>
+
 </body>
 </html>
