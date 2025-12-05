@@ -383,13 +383,17 @@
       let type, desc;
       if (count1 >= 4) {
         type = 1;
-        desc = "你偏向「高經濟發展，生物逐漸受害」類型，重視方便與賺錢，對減塑與保育的要求較低。";
+        desc = "你偏向「高經濟發展，生物逐漸受害」類型，重視方便與賺錢，對減塑與保育的要求較低。"<br>
+          "You tend toward the “High Economic Growth, Environmental Impact” type. You prioritize convenience and profit, and place relatively low emphasis on plastic reduction and conservation.";
       } else if (count1 >= 2) {
         type = 2;
-        desc = "你偏向「偶爾環保，態度中間」類型，有時會為環境做選擇，但也常為了方便而妥協。";
+        desc = "你偏向「偶爾環保，態度中間」類型，有時會為環境做選擇，但也常為了方便而妥協。"<br>
+          "You tend toward the “Occasionally Eco-Friendly, Middle-Ground” type. You sometimes make environmentally friendly choices, but often compromise when convenience is involved.";
       } else {
         type = 3;
-        desc = "你偏向「低發展但生物保育優良」類型，願意為海洋生物與環境品質做出取捨。";
+        desc = "你偏向「低發展但生物保育優良」類型，願意為海洋生物與環境品質做出取捨。"<br>
+          "You tend toward the “Low Development, Strong Conservation” type. You are willing to make trade-offs for marine life protection and environmental quality.
+";
       }
       return { type, desc, count1 };
     }
