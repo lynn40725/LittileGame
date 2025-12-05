@@ -119,12 +119,12 @@
       font-size: 0.85rem;
       color: #555;
     }
-    /* 題目標題 + 燈泡排版 */
+
+    /* 題目標題與燈泡 */
     .question-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
     }
     .hint-btn {
       border: none;
@@ -135,8 +135,6 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      white-space: nowrap;
     }
     .hint-box {
       margin-top: 4px;
@@ -148,37 +146,30 @@
       color: #333;
     }
     .hint-box ul {
-      margin: 4px 0 0;
       padding-left: 20px;
-    }
-    .hint-box li {
-      font-size: 0.9rem;
-      margin-bottom: 2px;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Plastic Reduction Action | Ocean Guardian Quiz</h1>
     <h1>減塑行動｜海洋守護小測驗</h1>
+
     <p class="intro">
-      🌟 Let’s take a quick quiz to find out which ‘Development vs. Conservation’ type best matches you!
-         Answer based on your true thoughts.<br>
-      🌟讓我們來做個簡單的心理測驗吧！看看你是哪種「發展與保育」類型！
-        請依照你的真實想法作答唷！
+      🌟 Let’s take a quick quiz to find out which ‘Development vs. Conservation’ type best matches you!<br>
+      🌟 讓我們來做個簡單的心理測驗吧！看看你是哪種「發展與保育」類型！
     </p>
 
     <div class="input-row">
       <label for="userName">Nickname / Seat Number</label>
-      <input type="text" id="userName" placeholder="3、Lily…" />
+      <input type="text" id="userName" placeholder="3, Lily…" />
     </div>
 
-    <div id="quizArea">
-      <!-- 題目會用 JS 動態塞進來 -->
-    </div>
+    <div id="quizArea"></div>
 
     <div class="actions">
-      <div class="progress" id="progressText"> 1 / 5 </div>
+      <div class="progress" id="progressText">1 / 5</div>
       <button class="primary" id="nextBtn" disabled>Next</button>
     </div>
 
@@ -187,103 +178,61 @@
   </div>
 
   <script>
-    // GAS Web App URL
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxC-OG6rbAwSCzoQESEiQeLpLyI39_nh54McjWfhSC0Z5O9brTUXMvwaqxk32q7CrVT/exec";
+    const GAS_URL =
+      "https://script.google.com/macros/s/AKfycbxC-OG6rbAwSCzoQESEiQeLpLyI39_nh54McjWfhSC0Z5O9brTUXMvwaqxk32q7CrVT/exec";
 
-    // 結果圖片
     const RESULT_IMAGE_URLS = {
-      1: "https://drive.google.com/thumbnail?id=1OtZ43YsvsRGHhjAiKqcWsG7YpaoU6bVu&sz=w1000", // 結果一
-      2: "https://drive.google.com/thumbnail?id=1GARMGL7Cm1fV3RsQbUHB4eRca-bDLZ0J&sz=w1000", // 結果二
-      3: "https://drive.google.com/thumbnail?id=1IQUBchBbZpV8d3kMyr_R4F_xlVLpSKmK&sz=w1000"  // 結果三
+      1: "https://drive.google.com/thumbnail?id=1OtZ43YsvsRGHhjAiKqcWsG7YpaoU6bVu&sz=w1000",
+      2: "https://drive.google.com/thumbnail?id=1GARMGL7Cm1fV3RsQbUHB4eRca-bDLZ0J&sz=w1000",
+      3: "https://drive.google.com/thumbnail?id=1IQUBchBbZpV8d3kMyr_R4F_xlVLpSKmK&sz=w1000"
     };
 
-    // 題目設定：textA 英文（A 語言）、textB 中文（B 語言）
-    // 選項：textA 英文、textB 中文
+    /* 題目資料（英文＋中文） */
     const questions = [
       {
         textA: "How do you want the local economy to develop?",
         textB: "你希望環境的經濟發展如何？",
         options: [
-          {
-            textA: "Make as much money as possible, prioritizing business.",
-            textB: "越賺錢越好，商業活動優先",
-            value: 1
-          },
-          {
-            textA: "It doesn’t have to earn that much, as long as the environment stays clean.",
-            textB: "不用太賺錢，但環境要保持乾淨",
-            value: 0
-          }
+          { textA: "Make as much money as possible, prioritizing business.", textB: "越賺錢越好，商業活動優先", value: 1 },
+          { textA: "It doesn’t have to earn that much, as long as the environment stays clean.", textB: "不用太賺錢，但環境要保持乾淨", value: 0 }
         ]
       },
       {
         textA: "If a very profitable mall could be built by the sea, what would you prefer?",
         textB: "如果海邊能蓋一個很賺錢的商場，你會希望？",
         options: [
-          {
-            textA: "Build it! Earning money is the most important.",
-            textB: "蓋！有賺錢最重要",
-            value: 1
-          },
-          {
-            textA: "Don’t build it. Keeping marine animals safe matters more.",
-            textB: "先不要，讓海洋動物安全比較重要",
-            value: 0
-          }
+          { textA: "Build it! Earning money is the most important.", textB: "蓋！有賺錢最重要", value: 1 },
+          { textA: "Don’t build it. Keeping marine animals safe matters more.", textB: "先不要，讓海洋動物安全比較重要", value: 0 }
         ]
       },
       {
-        textA: "You are buying a drink. The shop asks: sealed plastic cup or your own tumbler?",
+        textA: "You are buying a drink. Choose: sealed plastic cup or reusable cup?",
         textB: "你今天買飲料，店家問你封膜或自帶杯，你會選？",
         options: [
-          {
-            textA: "A sealed plastic cup. It’s the fastest and most convenient.",
-            textB: "封膜最快、最方便",
-            value: 1
-          },
-          {
-            textA: "My own tumbler, so I don’t create extra trash.",
-            textB: "自帶杯比較不會製造垃圾",
-            value: 0
-          }
+          { textA: "Plastic sealed cup. Fast and convenient.", textB: "封膜最快、最方便", value: 1 },
+          { textA: "Reusable cup to reduce waste.", textB: "自帶杯比較不會製造垃圾", value: 0 }
         ]
       },
       {
-        textA: "For a class field trip, which transportation would you choose?",
+        textA: "For a class field trip, which transportation do you prefer?",
         textB: "班級戶外教學要選交通工具，你偏好？",
         options: [
-          {
-            textA: "Tour bus. It’s the least tiring and saves time.",
-            textB: "遊覽車，最不累最省時",
-            value: 1
-          },
-          {
-            textA: "Walking or MRT, to reduce pollution and emissions.",
-            textB: "步行或捷運，減少排放比較好",
-            value: 0
-          }
+          { textA: "Tour bus — least tiring, saves time.", textB: "遊覽車，最不累最省時", value: 1 },
+          { textA: "Walking or MRT — lower emissions.", textB: "步行或捷運，減少排放比較好", value: 0 }
         ]
       },
       {
-        textA: "If you find a plastic bag that can still be used, what would you do?",
+        textA: "If you find a usable plastic bag, what would you do?",
         textB: "如果你撿到一個還能用的塑膠袋，你會？",
         options: [
-          {
-            textA: "Throw it away. It’s cheap anyway.",
-            textB: "丟掉，反正很便宜",
-            value: 1
-          },
-          {
-            textA: "Keep it and reuse it.",
-            textB: "留下來重複使用",
-            value: 0
-          }
+          { textA: "Throw it away — it's cheap anyway.", textB: "丟掉，反正很便宜", value: 1 },
+          { textA: "Keep and reuse it.", textB: "留下來重複使用", value: 0 }
         ]
       }
     ];
 
     let currentIndex = 0;
-    let answers = []; // 紀錄 0/1
+    let answers = [];
     let selectedValue = null;
     let startTime = Date.now();
     const sessionId = "sess_" + Math.random().toString(36).slice(2);
@@ -295,6 +244,7 @@
     const statusText = document.getElementById("statusText");
     const userNameInput = document.getElementById("userName");
 
+    /* ------------------ 題目顯示 ------------------ */
     function renderQuestion() {
       const q = questions[currentIndex];
       quizArea.innerHTML = "";
@@ -302,16 +252,14 @@
       const qBox = document.createElement("div");
       qBox.className = "question-box";
 
-      // 標題 + 燈泡
       const header = document.createElement("div");
       header.className = "question-header";
 
       const title = document.createElement("div");
       title.className = "question-title";
-      title.textContent = "第 " + (currentIndex + 1) + " 題";
+      title.textContent = "Question " + (currentIndex + 1);
 
       const hintBtn = document.createElement("button");
-      hintBtn.type = "button";
       hintBtn.className = "hint-btn";
       hintBtn.innerHTML = "💡";
 
@@ -320,46 +268,37 @@
 
       const qText = document.createElement("div");
       qText.className = "question-text";
-      // 題目主顯示英文
       qText.textContent = q.textA;
 
       const hintBox = document.createElement("div");
       hintBox.className = "hint-box";
       hintBox.style.display = "none";
 
-      // 中文題目 + 中文選項列表
-      const hintQuestion = document.createElement("div");
-      hintQuestion.textContent = q.textB;
-
-      const hintList = document.createElement("ul");
-      q.options.forEach((opt, idx) => {
-        const li = document.createElement("li");
-        li.textContent = (idx === 0 ? "A. " : "B. ") + opt.textB;
-        hintList.appendChild(li);
-      });
-
-      hintBox.appendChild(hintQuestion);
-      hintBox.appendChild(hintList);
+      hintBox.innerHTML = `
+        <div>${q.textB}</div>
+        <ul>
+          <li>A. ${q.options[0].textB}</li>
+          <li>B. ${q.options[1].textB}</li>
+        </ul>
+      `;
 
       hintBtn.addEventListener("click", () => {
-        hintBox.style.display = (hintBox.style.display === "none") ? "block" : "none";
+        hintBox.style.display = hintBox.style.display === "none" ? "block" : "none";
       });
 
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "options";
 
-      q.options.forEach((opt) => {
+      q.options.forEach(opt => {
         const btn = document.createElement("button");
         btn.className = "option-btn";
-        // 選項按鈕主顯示英文
         btn.textContent = opt.textA;
-        btn.addEventListener("click", () => {
+        btn.onclick = () => {
           selectedValue = opt.value;
-          // UI 標記被選中
-          Array.from(optionsDiv.children).forEach(c => c.classList.remove("option-selected"));
+          [...optionsDiv.children].forEach(b => b.classList.remove("option-selected"));
           btn.classList.add("option-selected");
           nextBtn.disabled = false;
-        });
+        };
         optionsDiv.appendChild(btn);
       });
 
@@ -369,43 +308,44 @@
       qBox.appendChild(optionsDiv);
       quizArea.appendChild(qBox);
 
-      progressText.textContent = "No. " + (currentIndex + 1) + " / " + questions.length ;
+      progressText.textContent = (currentIndex + 1) + " / " + questions.length;
       nextBtn.textContent = currentIndex === questions.length - 1 ? "Result" : "Next";
       nextBtn.disabled = true;
       selectedValue = null;
-      resultBox.style.display = "none";
-      statusText.textContent = "";
     }
 
+    /* ------------------ 分類邏輯 ------------------ */
     function calcType(answers) {
-      // answers 是 0/1，統計選 1 的次數
       const count1 = answers.filter(v => v === 1).length;
       let type, desc;
+
       if (count1 >= 4) {
         type = 1;
-        desc = "你偏向「高經濟發展，生物逐漸受害」類型，重視方便與賺錢，對減塑與保育的要求較低。"<br>
-          "You tend toward the “High Economic Growth, Environmental Impact” type. You prioritize convenience and profit, and place relatively low emphasis on plastic reduction and conservation.";
-      } else if (count1 >= 2) {
-        type = 2;
-        desc = "你偏向「偶爾環保，態度中間」類型，有時會為環境做選擇，但也常為了方便而妥協。"<br>
-          "You tend toward the “Occasionally Eco-Friendly, Middle-Ground” type. You sometimes make environmentally friendly choices, but often compromise when convenience is involved.";
-      } else {
-        type = 3;
-        desc = "你偏向「低發展但生物保育優良」類型，願意為海洋生物與環境品質做出取捨。"<br>
-          "You tend toward the “Low Development, Strong Conservation” type. You are willing to make trade-offs for marine life protection and environmental quality.
-";
+        desc = `你偏向「高經濟發展，生物逐漸受害」類型，重視方便與賺錢，對減塑與保育的要求較低。<br>
+You tend toward the “High Economic Growth, Environmental Impact” type. You prioritize convenience and profit, and place relatively low emphasis on plastic reduction and conservation.`;
       }
+      else if (count1 >= 2) {
+        type = 2;
+        desc = `你偏向「偶爾環保，態度中間」類型，有時會為環境做選擇，但也常為了方便而妥協。<br>
+You tend toward the “Occasionally Eco-Friendly, Middle-Ground” type. You sometimes make environmentally friendly choices, but often compromise when convenience is involved.`;
+      }
+      else {
+        type = 3;
+        desc = `你偏向「低發展但生物保育優良」類型，願意為海洋生物與環境品質做出取捨。<br>
+You tend toward the “Low Development, Strong Conservation” type. You are willing to make trade-offs for marine life protection and environmental quality.`;
+      }
+
       return { type, desc, count1 };
     }
 
+    /* ------------------ 上傳到 GAS ------------------ */
     async function submitToGAS(result) {
-      const timeUsedMs = Date.now() - startTime;
       const payload = {
-        sessionId: sessionId,
+        sessionId,
         userName: userNameInput.value || "",
-        answers: answers,     // 例如 [1,0,1,0,1]
-        type: result.type,    // 1 / 2 / 3
-        timeUsedMs: timeUsedMs
+        answers,
+        type: result.type,
+        timeUsedMs: Date.now() - startTime
       };
 
       statusText.textContent = "Uploading…";
@@ -413,50 +353,36 @@
       try {
         const res = await fetch(GAS_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "text/plain" // 用 text/plain 避免 CORS preflight 問題
-          },
+          headers: { "Content-Type": "text/plain" },
           body: JSON.stringify(payload)
         });
 
         const data = await res.json();
-        if (data.status === "ok") {
-          statusText.textContent = "✅ Done";
-        } else {
-          statusText.textContent = "⚠️ 上傳失敗（但你的結果已在這個頁面顯示）。";
-        }
-      } catch (err) {
-        console.error(err);
-        statusText.textContent = "⚠️ 上傳時發生錯誤（但你的結果已在這個頁面顯示）。";
+        statusText.textContent = data.status === "ok" ? "✅ Uploaded" : "⚠️ Upload failed";
+      } catch (e) {
+        statusText.textContent = "⚠️ Network error";
       }
     }
 
+    /* ------------------ 顯示結果 ------------------ */
     function showResult() {
       const result = calcType(answers);
       const imgUrl = RESULT_IMAGE_URLS[result.type];
-
-      let imgHtml = "";
-      if (imgUrl) {
-        imgHtml = `
-          <div style="margin-top:8px; text-align:center;">
-            <img src="${imgUrl}" alt="結果${result.type} 圖片"
-                 style="max-width:100%; border-radius:12px;"/>
-          </div>
-        `;
-      }
 
       resultBox.style.display = "block";
       resultBox.innerHTML = `
         <div><strong>你的類型：第 ${result.type} 類</strong></div>
         <div style="margin-top:6px;">${result.desc}</div>
-        ${imgHtml}
+        <div style="margin-top:8px; text-align:center;">
+          <img src="${imgUrl}" style="max-width:100%; border-radius:12px;">
+        </div>
       `;
 
-      // 送到 GAS
       submitToGAS(result);
     }
 
-    nextBtn.addEventListener("click", () => {
+    /* ------------------ 下一題按鈕 ------------------ */
+    nextBtn.onclick = () => {
       if (selectedValue === null) return;
       answers[currentIndex] = selectedValue;
 
@@ -464,15 +390,13 @@
         currentIndex++;
         renderQuestion();
       } else {
-        // 完成所有題目
         quizArea.innerHTML = "";
         progressText.textContent = "Done";
         nextBtn.disabled = true;
         showResult();
       }
-    });
+    };
 
-    // 初始化
     renderQuestion();
   </script>
 </body>
