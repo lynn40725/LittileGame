@@ -170,7 +170,7 @@
 
     <div class="input-row">
       <label for="userName">Nickname / Seat Number</label>
-      <input type="text" id="userName" placeholder="例如：3 號小明、Lily…" />
+      <input type="text" id="userName" placeholder="3、Lily…" />
     </div>
 
     <div id="quizArea">
@@ -369,8 +369,8 @@
       qBox.appendChild(optionsDiv);
       quizArea.appendChild(qBox);
 
-      progressText.textContent = "第 " + (currentIndex + 1) + " / " + questions.length + " 題";
-      nextBtn.textContent = currentIndex === questions.length - 1 ? "看結果" : "下一題";
+      progressText.textContent = "No. " + (currentIndex + 1) + " / " + questions.length ;
+      nextBtn.textContent = currentIndex === questions.length - 1 ? "Result" : "Next";
       nextBtn.disabled = true;
       selectedValue = null;
       resultBox.style.display = "none";
@@ -404,7 +404,7 @@
         timeUsedMs: timeUsedMs
       };
 
-      statusText.textContent = "資料上傳中…";
+      statusText.textContent = "Uploading…";
 
       try {
         const res = await fetch(GAS_URL, {
@@ -417,7 +417,7 @@
 
         const data = await res.json();
         if (data.status === "ok") {
-          statusText.textContent = "✅ 作答紀錄已送出。";
+          statusText.textContent = "✅ Done";
         } else {
           statusText.textContent = "⚠️ 上傳失敗（但你的結果已在這個頁面顯示）。";
         }
@@ -462,7 +462,7 @@
       } else {
         // 完成所有題目
         quizArea.innerHTML = "";
-        progressText.textContent = "已完成所有題目";
+        progressText.textContent = "Done";
         nextBtn.disabled = true;
         showResult();
       }
