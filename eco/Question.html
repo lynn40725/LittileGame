@@ -57,7 +57,7 @@
       font-weight: 600;
     }
     .question-text {
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       font-size: 1rem;
     }
     .options {
@@ -119,6 +119,42 @@
       font-size: 0.85rem;
       color: #555;
     }
+    /* 題目標題 + 燈泡排版 */
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .hint-btn {
+      border: none;
+      background: #fff3cd;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .hint-box {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #f1f8e9;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .hint-box ul {
+      margin: 4px 0 0;
+      padding-left: 20px;
+    }
+    .hint-box li {
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
   </style>
 </head>
 <body>
@@ -148,51 +184,97 @@
   </div>
 
   <script>
-    // TODO：把這裡換成你實際部署的 GAS Web App URL
+    // GAS Web App URL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxC-OG6rbAwSCzoQESEiQeLpLyI39_nh54McjWfhSC0Z5O9brTUXMvwaqxk32q7CrVT/exec";
 
-// 依「結果一 / 結果二 / 結果三」設定對應圖片
-// 請把這三個網址換成你自己的（結果一、結果二、結果三）
+    // 結果圖片
     const RESULT_IMAGE_URLS = {
       1: "https://drive.google.com/thumbnail?id=1OtZ43YsvsRGHhjAiKqcWsG7YpaoU6bVu&sz=w1000", // 結果一
       2: "https://drive.google.com/thumbnail?id=1GARMGL7Cm1fV3RsQbUHB4eRca-bDLZ0J&sz=w1000", // 結果二
       3: "https://drive.google.com/thumbnail?id=1IQUBchBbZpV8d3kMyr_R4F_xlVLpSKmK&sz=w1000"  // 結果三
-      };
-    // 題目設定（你可以依需求改文字）
+    };
+
+    // 題目設定：textA 英文（A 語言）、textB 中文（B 語言）
+    // 選項：textA 英文、textB 中文
     const questions = [
       {
-        text: "你希望環境的經濟發展如何？",
+        textA: "How do you want the local economy to develop?",
+        textB: "你希望環境的經濟發展如何？",
         options: [
-          { text: "越賺錢越好，商業活動優先", value: 1 }, // 類型 1 傾向
-          { text: "不用太賺錢，但環境要保持乾淨", value: 0 } // 類型 3 傾向
+          {
+            textA: "Make as much money as possible, prioritizing business.",
+            textB: "越賺錢越好，商業活動優先",
+            value: 1
+          },
+          {
+            textA: "It doesn’t have to earn that much, as long as the environment stays clean.",
+            textB: "不用太賺錢，但環境要保持乾淨",
+            value: 0
+          }
         ]
       },
       {
-        text: "如果海邊能蓋一個很賺錢的商場，你會希望？",
+        textA: "If a very profitable mall could be built by the sea, what would you prefer?",
+        textB: "如果海邊能蓋一個很賺錢的商場，你會希望？",
         options: [
-          { text: "蓋！有賺錢最重要", value: 1 },
-          { text: "先不要，讓海洋動物安全比較重要", value: 0 }
+          {
+            textA: "Build it! Earning money is the most important.",
+            textB: "蓋！有賺錢最重要",
+            value: 1
+          },
+          {
+            textA: "Don’t build it. Keeping marine animals safe matters more.",
+            textB: "先不要，讓海洋動物安全比較重要",
+            value: 0
+          }
         ]
       },
       {
-        text: "你今天買飲料，店家問你封膜或自帶杯，你會選？",
+        textA: "You are buying a drink. The shop asks: sealed plastic cup or your own tumbler?",
+        textB: "你今天買飲料，店家問你封膜或自帶杯，你會選？",
         options: [
-          { text: "封膜最快、最方便", value: 1 },
-          { text: "自帶杯比較不會製造垃圾", value: 0 }
+          {
+            textA: "A sealed plastic cup. It’s the fastest and most convenient.",
+            textB: "封膜最快、最方便",
+            value: 1
+          },
+          {
+            textA: "My own tumbler, so I don’t create extra trash.",
+            textB: "自帶杯比較不會製造垃圾",
+            value: 0
+          }
         ]
       },
       {
-        text: "班級戶外教學要選交通工具，你偏好？",
+        textA: "For a class field trip, which transportation would you choose?",
+        textB: "班級戶外教學要選交通工具，你偏好？",
         options: [
-          { text: "遊覽車，最不累最省時", value: 1 },
-          { text: "步行或捷運，減少排放比較好", value: 0 }
+          {
+            textA: "Tour bus. It’s the least tiring and saves time.",
+            textB: "遊覽車，最不累最省時",
+            value: 1
+          },
+          {
+            textA: "Walking or MRT, to reduce pollution and emissions.",
+            textB: "步行或捷運，減少排放比較好",
+            value: 0
+          }
         ]
       },
       {
-        text: "如果你撿到一個還能用的塑膠袋，你會？",
+        textA: "If you find a plastic bag that can still be used, what would you do?",
+        textB: "如果你撿到一個還能用的塑膠袋，你會？",
         options: [
-          { text: "丟掉，反正很便宜", value: 1 },
-          { text: "留下來重複使用", value: 0 }
+          {
+            textA: "Throw it away. It’s cheap anyway.",
+            textB: "丟掉，反正很便宜",
+            value: 1
+          },
+          {
+            textA: "Keep it and reuse it.",
+            textB: "留下來重複使用",
+            value: 0
+          }
         ]
       }
     ];
@@ -217,21 +299,57 @@
       const qBox = document.createElement("div");
       qBox.className = "question-box";
 
+      // 標題 + 燈泡
+      const header = document.createElement("div");
+      header.className = "question-header";
+
       const title = document.createElement("div");
       title.className = "question-title";
       title.textContent = "第 " + (currentIndex + 1) + " 題";
 
+      const hintBtn = document.createElement("button");
+      hintBtn.type = "button";
+      hintBtn.className = "hint-btn";
+      hintBtn.innerHTML = "💡 顯示 / 隱藏中文題目";
+
+      header.appendChild(title);
+      header.appendChild(hintBtn);
+
       const qText = document.createElement("div");
       qText.className = "question-text";
-      qText.textContent = q.text;
+      // 題目主顯示英文
+      qText.textContent = q.textA;
+
+      const hintBox = document.createElement("div");
+      hintBox.className = "hint-box";
+      hintBox.style.display = "none";
+
+      // 中文題目 + 中文選項列表
+      const hintQuestion = document.createElement("div");
+      hintQuestion.textContent = q.textB;
+
+      const hintList = document.createElement("ul");
+      q.options.forEach((opt, idx) => {
+        const li = document.createElement("li");
+        li.textContent = (idx === 0 ? "A. " : "B. ") + opt.textB;
+        hintList.appendChild(li);
+      });
+
+      hintBox.appendChild(hintQuestion);
+      hintBox.appendChild(hintList);
+
+      hintBtn.addEventListener("click", () => {
+        hintBox.style.display = (hintBox.style.display === "none") ? "block" : "none";
+      });
 
       const optionsDiv = document.createElement("div");
       optionsDiv.className = "options";
 
-      q.options.forEach((opt, index) => {
+      q.options.forEach((opt) => {
         const btn = document.createElement("button");
         btn.className = "option-btn";
-        btn.textContent = opt.text;
+        // 選項按鈕主顯示英文
+        btn.textContent = opt.textA;
         btn.addEventListener("click", () => {
           selectedValue = opt.value;
           // UI 標記被選中
@@ -242,8 +360,9 @@
         optionsDiv.appendChild(btn);
       });
 
-      qBox.appendChild(title);
+      qBox.appendChild(header);
       qBox.appendChild(qText);
+      qBox.appendChild(hintBox);
       qBox.appendChild(optionsDiv);
       quizArea.appendChild(qBox);
 
@@ -306,29 +425,30 @@
     }
 
     function showResult() {
-  const result = calcType(answers);
-  const imgUrl = RESULT_IMAGE_URLS[result.type];
+      const result = calcType(answers);
+      const imgUrl = RESULT_IMAGE_URLS[result.type];
 
-  let imgHtml = "";
-  if (imgUrl) {
-    imgHtml = `
-      <div style="margin-top:8px; text-align:center;">
-        <img src="${imgUrl}" alt="結果${result.type} 圖片"
-             style="max-width:100%; border-radius:12px;"/>
-      </div>
-    `;
-  }
+      let imgHtml = "";
+      if (imgUrl) {
+        imgHtml = `
+          <div style="margin-top:8px; text-align:center;">
+            <img src="${imgUrl}" alt="結果${result.type} 圖片"
+                 style="max-width:100%; border-radius:12px;"/>
+          </div>
+        `;
+      }
 
-  resultBox.style.display = "block";
-  resultBox.innerHTML = `
-    <div><strong>你的類型：第 ${result.type} 類</strong></div>
-    <div style="margin-top:6px;">${result.desc}</div>
-    ${imgHtml}
-  `;
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `
+        <div><strong>你的類型：第 ${result.type} 類</strong></div>
+        <div style="margin-top:6px;">${result.desc}</div>
+        ${imgHtml}
+      `;
 
-  // 送到 GAS
-  submitToGAS(result);
-}
+      // 送到 GAS
+      submitToGAS(result);
+    }
+
     nextBtn.addEventListener("click", () => {
       if (selectedValue === null) return;
       answers[currentIndex] = selectedValue;
