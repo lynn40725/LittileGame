@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數學打地鼠 - 視覺修復版</title>
+    <title>數學打地鼠 - 視覺修復版 V2</title>
     <style>
         :root {
             --primary-color: #FFB347;
             --bg-color: #87CEEB;
-            --mole-bg: #5D4037;
+            --mole-bg: #4E342E; /* 更深的洞穴顏色 */
             --energy-color: #4CAF50;
             --danger-color: #FF5252;
         }
@@ -122,17 +122,17 @@
             border: 5px solid #3E2723;
         }
 
-        /* 地鼠樣式 - 修正 SVG 編碼 */
+        /* 地鼠樣式 - 全新配色 (粉嫩肉色) */
         .mole {
             width: 100%;
             height: 100%;
             position: absolute;
-            bottom: -100%;
+            bottom: -100%; /* 初始位置在洞外 */
             left: 0;
-            transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             
-            /* 正常地鼠 SVG */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%238D6E63' stroke='%233E2723' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%233E2723' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFCCBC'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            /* 新配色的 SVG */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23E64A19' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23E64A19' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: center bottom;
             background-size: 85%;
@@ -141,20 +141,19 @@
             justify-content: center;
             align-items: center;
             cursor: none;
-            z-index: 2; /* 確保在洞之上 */
+            z-index: 2;
         }
 
         .mole.up {
-            bottom: -10px;
+            bottom: -10px; /* 冒出來的位置 */
         }
 
-        /* 被打到的地鼠 SVG */
+        /* 被打到的地鼠 SVG (暈倒 + 星星) */
         .mole.hit {
             bottom: -10px;
-            /* 暈倒地鼠 SVG */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%238D6E63' stroke='%233E2723' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFCCBC'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
             transition: bottom 0.1s ease-in;
-            pointer-events: none; /* 被打到後不能再點 */
+            pointer-events: none;
         }
 
         .mole-sign {
@@ -165,27 +164,26 @@
             font-weight: 900;
             font-size: 1.4rem;
             color: #000;
-            margin-top: 60px; /* 調整文字位置 */
-            pointer-events: none; /* 關鍵：讓點擊穿透文字打到地鼠 */
+            margin-top: 60px;
+            pointer-events: none;
             box-shadow: 0 4px 0 rgba(0,0,0,0.2);
             font-family: 'Arial Black', sans-serif;
             z-index: 3;
         }
 
-        /* 鎚子 (修正偏移) */
+        /* 鎚子 */
         #hammer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100px;
             height: 100px;
-            pointer-events: none; /* 關鍵：讓點擊穿透鎚子 */
+            pointer-events: none;
             z-index: 9999;
-            /* 預設木槌 */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='30' y='20' width='40' height='50' rx='5' fill='%238D6E63' stroke='%233E2723' stroke-width='3'/%3E%3Crect x='45' y='65' width='10' height='30' fill='%23D7CCC8' stroke='%233E2723' stroke-width='2'/%3E%3Ccircle cx='35' cy='30' r='3' fill='%235D4037'/%3E%3Ccircle cx='65' cy='30' r='3' fill='%235D4037'/%3E%3C/svg%3E");
             background-size: contain;
             background-repeat: no-repeat;
-            transform: translate(-30%, -30%) rotate(0deg); /* 校正中心點 */
+            transform: translate(-30%, -30%) rotate(0deg);
             transition: transform 0.05s;
         }
 
@@ -320,7 +318,6 @@
     </div>
 
     <script>
-        // 遊戲變數
         let score = 0;
         let level = 1;
         let energy = 100;
@@ -333,12 +330,10 @@
         let spawnTimer = null;
         let moleTimers = []; 
         
-        // 參數
         const REQUIRED_HITS_SWITCH = 3; 
         const HITS_TO_LEVEL_UP = 10; 
         const MAX_ENERGY = 100;
         
-        // DOM
         const energyBar = document.getElementById('energy-bar');
         const scoreDisplay = document.getElementById('score-display');
         const levelDisplay = document.getElementById('level-display');
@@ -347,22 +342,16 @@
         const hammer = document.getElementById('hammer');
 
         function init() {
-            // 滑鼠移動與點擊
             document.addEventListener('mousemove', moveHammer);
             document.addEventListener('mousedown', swingHammer);
             document.addEventListener('mouseup', resetHammer);
             
-            // 綁定地鼠
             for(let i=0; i<9; i++) {
                 const moleEl = document.getElementById(`mole-${i}`);
-                
-                // 使用 mousedown 確保反應最快，且綁定在 mole 元素上
                 moleEl.addEventListener('mousedown', (e) => {
-                    // 防止事件冒泡
                     e.stopPropagation(); 
                     hitMole(i);
                 });
-
                 moles.push({ 
                     element: moleEl, 
                     sign: moleEl.querySelector('.mole-sign'), 
@@ -373,7 +362,6 @@
         }
 
         function moveHammer(e) {
-            // 直接將位置設為滑鼠座標，CSS 中的 translate 會負責校正中心點
             hammer.style.left = e.clientX + 'px';
             hammer.style.top = e.clientY + 'px';
         }
@@ -386,29 +374,21 @@
             hammer.classList.remove('hammer-hit');
         }
 
-        // 槌子外觀 SVG (編碼修正版)
         function updateHammerSkin() {
             let svg = '';
-            
             if (level >= 10) { 
-                // 鑽石槌
                 svg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300BCD4;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%233F51B5;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='25' y='15' width='50' height='40' fill='url(%23grad1)' stroke='%231A237E' stroke-width='2' rx='5'/%3E%3Cpath d='M25,15 L50,5 L75,15' fill='%2380DEEA' stroke='%231A237E' stroke-width='1'/%3E%3Crect x='45' y='55' width='10' height='40' fill='%23212121' stroke='%23CFD8DC' stroke-width='2'/%3E%3Ccircle cx='50' cy='35' r='8' fill='white' opacity='0.5'/%3E%3C/svg%3E";
             } else if (level >= 4) { 
-                // 黃金槌
                 svg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='gold' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23FFECB3;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23FFC107;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23FF6F00;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='20' y='20' width='60' height='35' rx='8' fill='url(%23gold)' stroke='%23FF6F00' stroke-width='3'/%3E%3Crect x='45' y='55' width='10' height='40' fill='%235D4037' stroke='%233E2723' stroke-width='2'/%3E%3Ccircle cx='30' cy='37' r='4' fill='%23FFF'/%3E%3Ccircle cx='70' cy='37' r='4' fill='%23FFF'/%3E%3C/svg%3E";
             } else { 
-                // 木槌
                 svg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='30' y='20' width='40' height='50' rx='5' fill='%238D6E63' stroke='%233E2723' stroke-width='3'/%3E%3Crect x='45' y='65' width='10' height='30' fill='%23D7CCC8' stroke='%233E2723' stroke-width='2'/%3E%3Ccircle cx='35' cy='30' r='3' fill='%235D4037'/%3E%3Ccircle cx='65' cy='30' r='3' fill='%235D4037'/%3E%3C/svg%3E";
             }
-
             hammer.style.backgroundImage = `url("${svg}")`;
         }
 
         function startGame() {
             document.getElementById('modal').style.display = 'none';
-            // 讓滑鼠隱藏，顯示槌子
             document.body.style.cursor = 'none';
-            
             score = 0;
             level = 1;
             energy = 100;
@@ -416,7 +396,6 @@
             correctCountForTarget = 0;
             correctTotalCount = 0;
             isGameRunning = true;
-            
             updateHUD();
             updateHammerSkin();
             generateNewTarget();
@@ -427,10 +406,7 @@
             isGameRunning = false;
             clearTimeout(spawnTimer);
             clearAllMoles();
-            
-            // 恢復滑鼠
             document.body.style.cursor = 'default';
-            
             const modal = document.getElementById('modal');
             modal.style.display = 'flex';
             modal.querySelector('h1').innerText = "遊戲結束";
@@ -442,25 +418,21 @@
             let min, max;
             let validTarget = false;
             let tempTarget = 0;
-
-            if (level <= 3) { min = 6; max = 81; } // 避免太小的數字
+            if (level <= 3) { min = 6; max = 81; }
             else if (level <= 6) { min = 20; max = 150; }
             else if (level <= 9) { min = 100; max = 400; }
             else { min = 300; max = 999; }
 
             while (!validTarget) {
                 tempTarget = Math.floor(Math.random() * (max - min + 1)) + min;
-                // 檢查是否有足夠的因數，避免質數太難出題
                 let factors = 0;
                 for (let i = 2; i <= Math.sqrt(tempTarget); i++) {
                     if (tempTarget % i === 0) factors++;
                 }
                 if (factors > 0) validTarget = true;
             }
-
             targetNumber = tempTarget;
             targetNumberDisplay.innerText = targetNumber;
-            
             const board = document.getElementById('target-board');
             board.style.animation = 'none';
             board.offsetHeight; 
@@ -470,8 +442,6 @@
         function generateEquation(target, isCorrect, usedLabels = []) {
             let equation = "";
             let retryCount = 0;
-            
-            // 強制檢查重複 (包含 A x B 和 B x A 視為重複)
             const isDuplicate = (eq) => {
                 if(usedLabels.includes(eq)) return true;
                 let parts = eq.split(' x ');
@@ -486,41 +456,32 @@
                     for (let i = 2; i <= Math.sqrt(target); i++) {
                         if (target % i === 0) {
                             factors.push(i);
-                            if(i*i !== target) factors.push(target/i); // 把兩邊因數都放進去
+                            if(i*i !== target) factors.push(target/i);
                         }
                     }
-                    // 隨機選一對
                     let f1 = factors[Math.floor(Math.random() * factors.length)];
                     let f2 = target / f1;
                     equation = Math.random() > 0.5 ? `${f1} x ${f2}` : `${f2} x ${f1}`;
                 } else {
-                    // 錯誤答案生成邏輯
                     let offset = Math.floor(Math.random() * 5) + 1;
                     offset = Math.random() > 0.5 ? offset : -offset;
                     let fakeTarget = target + offset;
                     if (fakeTarget < 4) fakeTarget = 4;
-                    
                     let f1 = Math.floor(Math.sqrt(fakeTarget));
                     if (f1 < 2) f1 = 2;
                     let f2 = Math.floor(fakeTarget / f1);
-                    
-                    // 確保算出來真的不是正確答案
                     if (f1 * f2 === target) f2++;
-                    
                     equation = Math.random() > 0.5 ? `${f1} x ${f2}` : `${f2} x ${f1}`;
                 }
                 retryCount++;
             } while (isDuplicate(equation) && retryCount < 20);
-
             return equation;
         }
 
         function gameLoop() {
             if (!isGameRunning) return;
-
             let spawnInterval = Math.max(700, 2000 - (level * 100) - (combo * 30));
             if (correctCountForTarget === 0) spawnInterval += 800;
-
             spawnTimer = setTimeout(() => {
                 spawnMoles();
                 gameLoop();
@@ -530,38 +491,25 @@
         function spawnMoles() {
             let activeMoles = moles.filter(m => m.isUp).length;
             if (activeMoles > 2) return;
-
-            // 隨機決定數量
-            let count = Math.floor(Math.random() * 2) + 1; // 1~2隻
+            let count = Math.floor(Math.random() * 2) + 1;
             if(level > 5) count = Math.floor(Math.random() * 3) + 1;
-
             let indices = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
-            
             let hasCorrectInThisWave = false;
             let currentWaveLabels = [];
 
             for (let i = 0; i < count; i++) {
                 let idx = indices[i];
                 let moleObj = moles[idx];
-                
                 if (moleObj.isUp) continue;
-
-                // 決定是否正確：如果這波還沒正確，且是最後一隻，保底正確
                 let isCorrect = false;
                 if (i === count - 1 && !hasCorrectInThisWave) {
-                    // 這裡加個機率，不一定每波都要有正確答案，增加緊張感
-                    // 但為了避免卡關，如果當前都沒打對過，機率高一點
                     isCorrect = Math.random() > 0.3; 
                 } else {
                     isCorrect = Math.random() > 0.7;
                 }
-                
                 if (isCorrect) hasCorrectInThisWave = true;
-
                 let eqText = generateEquation(targetNumber, isCorrect, currentWaveLabels);
                 currentWaveLabels.push(eqText);
-
-                // 錯開出現時間
                 setTimeout(() => {
                     if(isGameRunning) popUpMole(idx, isCorrect, eqText);
                 }, i * 150);
@@ -571,20 +519,16 @@
         function popUpMole(idx, isCorrect, text) {
             const moleObj = moles[idx];
             if(moleObj.isUp) return;
-
             moleObj.isUp = true;
             moleObj.isCorrect = isCorrect;
             moleObj.sign.innerText = text;
-            
             moleObj.element.classList.remove('hit');
             moleObj.element.classList.add('up');
 
             let stayTime = Math.max(1200, 4000 - (level * 200) - (combo * 50));
             if (correctCountForTarget === 0) stayTime += 800;
 
-            // 清除舊的計時器
             if (moleTimers[idx]) clearTimeout(moleTimers[idx]);
-
             moleTimers[idx] = setTimeout(() => {
                 if (moleObj.isUp) {
                     retractMole(idx);
@@ -611,15 +555,10 @@
         function hitMole(idx) {
             if (!isGameRunning) return;
             const moleObj = moles[idx];
-            
-            // 只有冒出來且沒被打過的時候才算
             if (!moleObj.isUp || moleObj.element.classList.contains('hit')) return;
-
-            // 視覺回饋
             moleObj.element.classList.add('hit');
-            swingHammer(); // 強制觸發槌子動畫
-
-            // 延遲縮回
+            swingHammer();
+            if (moleTimers[idx]) clearTimeout(moleTimers[idx]); // 修正：打到後清除縮回計時器
             setTimeout(() => {
                 retractMole(idx);
             }, 250);
@@ -636,39 +575,28 @@
             score += (10 * combo);
             correctCountForTarget++;
             correctTotalCount++;
-            
-            energy = Math.min(MAX_ENERGY, energy + 8); // 回血多一點
-            
-            showFloatText(idx, "Nice!", "#2E7D32"); // 深綠色字
-
+            energy = Math.min(MAX_ENERGY, energy + 8);
+            showFloatText(idx, "Nice!", "#2E7D32");
             if (correctTotalCount % HITS_TO_LEVEL_UP === 0) {
                 level++;
                 energy = MAX_ENERGY;
                 updateHammerSkin();
                 showFloatText(idx, "Level Up!", "#FFD700");
             }
-
             if (correctCountForTarget >= REQUIRED_HITS_SWITCH) {
                 correctCountForTarget = 0;
                 clearAllMoles();
                 setTimeout(generateNewTarget, 600);
             }
-
             updateHUD();
         }
 
         function handleMistake(idx, msg) {
             combo = 0;
             energy -= 20;
-            
             document.body.classList.add('shake-screen');
             setTimeout(() => document.body.classList.remove('shake-screen'), 400);
-
             showFloatText(idx, `${msg} (${targetNumber})`, "#D32F2F");
-
-            // 錯誤時不要馬上全縮回，讓學生看清楚一點
-            // 但為了懲罰感，可以縮短目前場上地鼠的時間
-            
             if (energy <= 0) {
                 energy = 0;
                 updateHUD();
@@ -680,9 +608,7 @@
 
         function showFloatText(moleIdx, text, color) {
             const mole = document.getElementById(`mole-${moleIdx}`);
-            // 取得洞的位置
             const rect = mole.parentElement.getBoundingClientRect();
-            
             const floatDiv = document.createElement('div');
             floatDiv.innerText = text;
             floatDiv.className = 'float-text';
@@ -690,7 +616,6 @@
             floatDiv.style.left = (rect.left + rect.width/2 - 30) + 'px';
             floatDiv.style.top = (rect.top) + 'px';
             document.body.appendChild(floatDiv);
-
             setTimeout(() => {
                 floatDiv.remove();
             }, 800);
@@ -701,7 +626,6 @@
             levelDisplay.innerText = `Lv. ${level}`;
             comboDisplay.innerText = `Combo: ${combo}`;
             energyBar.style.width = `${energy}%`;
-            
             if (energy < 30) {
                 energyBar.style.backgroundColor = "var(--danger-color)";
             } else {
