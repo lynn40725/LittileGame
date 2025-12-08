@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>打地鼠</title>
+    <title>數學打地鼠 - 數字大亂鬥</title>
     <style>
         :root {
             --primary-color: #FFB347; /* 溫暖的橘黃色 */
@@ -23,7 +23,7 @@
             height: 100vh;
             overflow: hidden;
             user-select: none;
-            cursor: default; /* 預設游標，之後會用 JS 替換 */
+            cursor: none; /* 隱藏預設游標 */
         }
 
         /* 遊戲容器 */
@@ -175,7 +175,7 @@
         }
         
         #hammer {
-            position: absolute;
+            position: fixed; /* 改為 fixed */
             width: 60px;
             height: 60px;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="30" y="10" width="40" height="50" fill="brown" stroke="black" stroke-width="2"/><rect x="45" y="60" width="10" height="30" fill="tan" stroke="black" stroke-width="2"/></svg>'); /* 木槌預設 */
