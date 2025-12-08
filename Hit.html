@@ -23,8 +23,8 @@
             height: 100vh;
             overflow: hidden;
             user-select: none;
-            cursor: none;
-            touch-action: none;
+            cursor: none; /* 隱藏游標 */
+            touch-action: none; /* 禁止拖曳滾動 */
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -85,7 +85,7 @@
             padding: 5px 30px;
             margin: 10px 0;
             text-align: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 900;
             color: #d35400;
             box-shadow: 0 6px 0 #c0392b;
@@ -108,7 +108,7 @@
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px; 
+            gap: 15px; 
             width: 95%;
             max-width: 500px;
             margin: auto;
@@ -120,7 +120,7 @@
             border-radius: 50%;
             aspect-ratio: 1;
             position: relative;
-            overflow: hidden; 
+            overflow: hidden; /* 必須隱藏，否則縮回去時會露出來 */
             box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
             border: 5px solid #281916;
             z-index: 1;
@@ -133,55 +133,58 @@
             position: absolute;
             bottom: -100%; 
             left: 0;
-            transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* 彈出速度優化 */
+            transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             z-index: 2;
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 90%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cellipse cx='70' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='75' cy='75' r='5' fill='white'/%3E%3Cellipse cx='130' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='135' cy='75' r='5' fill='white'/%3E%3Cellipse cx='100' cy='105' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%233E2723'/%3E%3Cpath d='M100,105 L100,112 M90,112 Q100,120 110,112' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3Ccircle cx='30' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C/svg%3E");
+            background-size: 85%; /* 稍微縮小身體，讓看板更明顯 */
+            /* Q版地鼠 SVG */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23BF360C' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23BF360C' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             cursor: none;
             display: flex;
             justify-content: center;
         }
 
         .mole.up {
-            bottom: -10px;
+            bottom: -5px;
         }
 
         .mole.hit {
-            bottom: -20px;
+            bottom: -15px;
             transition: bottom 0.1s ease-in;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='110' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='112' r='8' fill='black'/%3E%3Ccircle cx='30' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Cpath d='M30,50 L40,30 L50,50 L30,40 L50,40 Z' fill='%23FFD700'/%3E%3Cpath d='M160,40 L170,20 L180,40 L160,30 L180,30 Z' fill='%23FFD700'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
             pointer-events: none;
         }
 
-        /* 看板樣式 */
+        /* 看板樣式 - 極限大 */
         .mole-sign {
             position: absolute;
-            bottom: 10%;
+            bottom: 12%;
             left: 50%;
             transform: translateX(-50%);
-            width: 140%;
-            height: 70px;
+            width: 98%; /* 撐滿洞口 */
+            height: 75px;
             background: #FFECB3;
-            border: 4px solid #8D6E63;
-            border-radius: 10px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            border: 4px solid #3E2723;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.2rem;
+            
+            font-size: 2.4rem; /* 超大字體 */
             font-weight: 900;
             font-family: 'Arial Black', sans-serif;
-            color: #3E2723;
+            color: #000;
             white-space: nowrap;
             pointer-events: none;
             z-index: 3;
         }
         
         .mole.hit .mole-sign {
-            transform: translateX(-50%) rotate(15deg) translateY(20px);
-            transition: transform 0.1s ease-in;
+            transform: translateX(-50%) rotate(10deg) translateY(10px);
             background: #FFCDD2;
             border-color: #C62828;
         }
@@ -364,6 +367,7 @@
             document.addEventListener('mousedown', swingHammer);
             document.addEventListener('mouseup', resetHammer);
 
+            // 觸控事件
             document.addEventListener('touchstart', (e) => {
                 if(e.touches.length > 0) {
                     updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
@@ -536,8 +540,14 @@
 
         function gameLoop() {
             if (!isGameRunning) return;
-            let spawnInterval = Math.max(700, 2000 - (level * 100) - (combo * 30));
-            if (correctCountForTarget === 0) spawnInterval += 800;
+            
+            // 速度優化公式：加速感更強
+            // 基礎 1500ms -> 每級加速 100ms -> Combo 加速 50ms -> 最快 400ms
+            let spawnInterval = Math.max(400, 1500 - (level * 100) - (combo * 50));
+            
+            // 換題後第一波給予極短緩衝 (0.3秒)，讓節奏不中斷
+            if (correctCountForTarget === 0) spawnInterval = 300;
+            
             spawnTimer = setTimeout(() => {
                 spawnMoles();
                 gameLoop();
@@ -548,8 +558,12 @@
             if (isSwitchingTarget) return; 
             let activeMoles = moles.filter(m => m.isUp).length;
             if (activeMoles > 2) return;
-            let count = Math.floor(Math.random() * 2) + 1;
-            if(level > 5) count = Math.floor(Math.random() * 3) + 1;
+            
+            // 隨等級增加一次出多隻的機率
+            let count = 1;
+            if(level > 3 && Math.random() > 0.5) count = 2;
+            if(level > 8 && Math.random() > 0.3) count = 3;
+            
             let indices = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
             let hasCorrectInThisWave = false;
             let currentWaveLabels = [];
@@ -558,18 +572,25 @@
                 let idx = indices[i];
                 let moleObj = moles[idx];
                 if (moleObj.isUp) continue;
+                
                 let isCorrect = false;
+                // 智能保底：如果這波還沒正確，且是最後一隻，則給正確
                 if (i === count - 1 && !hasCorrectInThisWave) {
-                    isCorrect = Math.random() > 0.3; 
+                    isCorrect = Math.random() > 0.3; // 70% 機率這波會有正確答案
                 } else {
-                    isCorrect = Math.random() > 0.7;
+                    isCorrect = Math.random() > 0.5;
                 }
+                
                 if (isCorrect) hasCorrectInThisWave = true;
                 let eqText = generateEquation(targetNumber, isCorrect, currentWaveLabels);
                 currentWaveLabels.push(eqText);
+                
+                // 波浪出現間隔 (Stagger) 也隨等級縮短
+                let stagger = Math.max(50, 150 - (level * 10));
+                
                 setTimeout(() => {
                     if(isGameRunning && !isSwitchingTarget) popUpMole(idx, isCorrect, eqText);
-                }, i * 150);
+                }, i * stagger);
             }
         }
 
@@ -582,13 +603,14 @@
             moleObj.element.classList.remove('hit');
             moleObj.element.classList.add('up');
 
-            let stayTime = Math.max(1200, 4000 - (level * 200) - (combo * 50));
-            if (correctCountForTarget === 0) stayTime += 800;
-
+            // 停留時間優化：高難度下非常快
+            let stayTime = Math.max(800, 3000 - (level * 150) - (combo * 50));
+            
             if (moleTimers[idx]) clearTimeout(moleTimers[idx]);
             moleTimers[idx] = setTimeout(() => {
                 if (moleObj.isUp) {
                     retractMole(idx);
+                    // 修正：換題期間不判定 Miss
                     if (moleObj.isCorrect && !isSwitchingTarget) {
                         handleMistake(idx, "Miss!");
                     }
@@ -620,6 +642,9 @@
 
             moleObj.element.classList.add('hit');
             swingHammer();
+            
+            // 觸控震動回饋 (如果裝置支援)
+            if (navigator.vibrate) navigator.vibrate(50);
 
             setTimeout(() => {
                 retractMole(idx);
@@ -647,18 +672,19 @@
             }
             if (correctCountForTarget >= REQUIRED_HITS_SWITCH) {
                 isSwitchingTarget = true; 
-                // 1. 先停止生成
+                // 1. 停止生成
                 clearTimeout(spawnTimer);
-                // 2. 清空場上地鼠 (強制縮回)
+                // 2. 清空場上
                 clearAllMoles();
-                // 3. 等待一下讓畫面乾淨，再換題
+                // 3. 極速換題 (0.5秒後換數字，再0.2秒後出怪)
                 setTimeout(() => {
                     generateNewTarget();
-                    // 4. 再等一下才開始出新怪
                     setTimeout(() => {
+                        // 重置為 false 必須在新怪出來前
+                        // 但由 gameLoop 控制
                         gameLoop();
-                    }, 800);
-                }, 600);
+                    }, 200);
+                }, 500); 
             } else {
                 updateHUD();
             }
