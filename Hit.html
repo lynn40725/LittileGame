@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠</title>
+    <title>數學打地鼠 - V11</title>
     <style>
         :root {
             --primary-color: #FFB347;
@@ -120,25 +120,24 @@
             border-radius: 50%;
             aspect-ratio: 1;
             position: relative;
-            overflow: hidden; /* 必須隱藏，否則縮回去時會露出來 */
+            overflow: hidden; 
             box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
             border: 5px solid #281916;
             z-index: 1;
         }
 
-        /* 地鼠容器 */
+        /* 地鼠容器 - 確保使用可愛版 SVG */
         .mole {
             width: 100%;
             height: 100%;
             position: absolute;
             bottom: -100%; 
             left: 0;
-            /* 彈出速度優化 */
             transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             z-index: 2;
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 85%; /* 稍微縮小身體，讓看板更明顯 */
+            background-size: 85%; 
             /* Q版地鼠 SVG */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23BF360C' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23BF360C' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             cursor: none;
@@ -150,6 +149,7 @@
             bottom: -5px;
         }
 
+        /* 被打到的可愛地鼠 SVG */
         .mole.hit {
             bottom: -15px;
             transition: bottom 0.1s ease-in;
@@ -541,11 +541,10 @@
         function gameLoop() {
             if (!isGameRunning) return;
             
-            // 速度優化公式：加速感更強
-            // 基礎 1500ms -> 每級加速 100ms -> Combo 加速 50ms -> 最快 400ms
+            // 速度優化公式
             let spawnInterval = Math.max(400, 1500 - (level * 100) - (combo * 50));
             
-            // 換題後第一波給予極短緩衝 (0.3秒)，讓節奏不中斷
+            // 換題後第一波給予極短緩衝
             if (correctCountForTarget === 0) spawnInterval = 300;
             
             spawnTimer = setTimeout(() => {
@@ -559,7 +558,6 @@
             let activeMoles = moles.filter(m => m.isUp).length;
             if (activeMoles > 2) return;
             
-            // 隨等級增加一次出多隻的機率
             let count = 1;
             if(level > 3 && Math.random() > 0.5) count = 2;
             if(level > 8 && Math.random() > 0.3) count = 3;
@@ -574,9 +572,8 @@
                 if (moleObj.isUp) continue;
                 
                 let isCorrect = false;
-                // 智能保底：如果這波還沒正確，且是最後一隻，則給正確
                 if (i === count - 1 && !hasCorrectInThisWave) {
-                    isCorrect = Math.random() > 0.3; // 70% 機率這波會有正確答案
+                    isCorrect = Math.random() > 0.3; 
                 } else {
                     isCorrect = Math.random() > 0.5;
                 }
@@ -585,7 +582,6 @@
                 let eqText = generateEquation(targetNumber, isCorrect, currentWaveLabels);
                 currentWaveLabels.push(eqText);
                 
-                // 波浪出現間隔 (Stagger) 也隨等級縮短
                 let stagger = Math.max(50, 150 - (level * 10));
                 
                 setTimeout(() => {
@@ -603,14 +599,12 @@
             moleObj.element.classList.remove('hit');
             moleObj.element.classList.add('up');
 
-            // 停留時間優化：高難度下非常快
             let stayTime = Math.max(800, 3000 - (level * 150) - (combo * 50));
             
             if (moleTimers[idx]) clearTimeout(moleTimers[idx]);
             moleTimers[idx] = setTimeout(() => {
                 if (moleObj.isUp) {
                     retractMole(idx);
-                    // 修正：換題期間不判定 Miss
                     if (moleObj.isCorrect && !isSwitchingTarget) {
                         handleMistake(idx, "Miss!");
                     }
@@ -643,7 +637,6 @@
             moleObj.element.classList.add('hit');
             swingHammer();
             
-            // 觸控震動回饋 (如果裝置支援)
             if (navigator.vibrate) navigator.vibrate(50);
 
             setTimeout(() => {
@@ -672,22 +665,17 @@
             }
             if (correctCountForTarget >= REQUIRED_HITS_SWITCH) {
                 isSwitchingTarget = true; 
-                // 1. 停止生成
                 clearTimeout(spawnTimer);
-                // 2. 清空場上
                 clearAllMoles();
-                // 3. 極速換題 (0.5秒後換數字，再0.2秒後出怪)
                 setTimeout(() => {
                     generateNewTarget();
                     setTimeout(() => {
-                        // 重置為 false 必須在新怪出來前
-                        // 但由 gameLoop 控制
                         gameLoop();
                     }, 200);
                 }, 500); 
-            } else {
-                updateHUD();
             }
+            // 修正：無論是否換題，都要更新 HUD，確保 Combo 顯示正確
+            updateHUD();
         }
 
         function handleMistake(idx, msg) {
