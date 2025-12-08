@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數學打地鼠 - 最終完美版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>數學打地鼠 - 觸控優化版 V3</title>
     <style>
         :root {
             --primary-color: #FFB347;
@@ -24,6 +24,9 @@
             overflow: hidden;
             user-select: none;
             cursor: none; /* 隱藏系統鼠標 */
+            /* 關鍵：禁止觸控時的滾動與縮放 */
+            touch-action: none; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         #game-container {
@@ -127,11 +130,11 @@
             width: 100%;
             height: 100%;
             position: absolute;
-            bottom: -100%; /* 預設藏在下面 */
+            bottom: -100%; 
             left: 0;
             transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             
-            /* 粉色地鼠 */
+            /* 粉色地鼠 SVG */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23E64A19' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23E64A19' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: center bottom;
@@ -145,12 +148,12 @@
         }
 
         .mole.up {
-            bottom: -10px; /* 冒出來 */
+            bottom: -10px;
         }
 
         /* 被打到的地鼠 */
         .mole.hit {
-            bottom: -10px; /* 保持在上面一下下 */
+            bottom: -10px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
             transition: bottom 0.1s ease-in;
             pointer-events: none;
@@ -184,7 +187,8 @@
             background-size: contain;
             background-repeat: no-repeat;
             transform: translate(-30%, -30%) rotate(0deg);
-            transition: transform 0.05s;
+            transition: transform 0.05s, opacity 0.3s; /* 增加透明度過渡 */
+            opacity: 0; /* 初始隱藏，動了才出現 */
         }
 
         #hammer.hammer-hit {
@@ -329,6 +333,7 @@
         let moles = []; 
         let spawnTimer = null;
         let moleTimers = []; 
+        let idleTimer = null; // 閒置計時器
         
         const REQUIRED_HITS_SWITCH = 3; 
         const HITS_TO_LEVEL_UP = 10; 
@@ -342,16 +347,48 @@
         const hammer = document.getElementById('hammer');
 
         function init() {
-            document.addEventListener('mousemove', moveHammer);
+            // 滑鼠事件
+            document.addEventListener('mousemove', (e) => updateHammerPos(e.clientX, e.clientY));
             document.addEventListener('mousedown', swingHammer);
             document.addEventListener('mouseup', resetHammer);
+
+            // 觸控事件 (平板/手機優化)
+            document.addEventListener('touchstart', (e) => {
+                // e.preventDefault(); // 防止滾動，但在某些瀏覽器可能影響點擊，這裡用 CSS touch-action 處理
+                if(e.touches.length > 0) {
+                    updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
+                    swingHammer();
+                }
+            }, {passive: false});
+
+            document.addEventListener('touchmove', (e) => {
+                // e.preventDefault(); 
+                if(e.touches.length > 0) {
+                    updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, {passive: false});
             
+            // 綁定地鼠點擊
             for(let i=0; i<9; i++) {
                 const moleEl = document.getElementById(`mole-${i}`);
+                
+                // 滑鼠點擊
                 moleEl.addEventListener('mousedown', (e) => {
                     e.stopPropagation(); 
                     hitMole(i);
                 });
+
+                // 觸控點擊 (直接綁定 touchstart 以獲得最快反應)
+                moleEl.addEventListener('touchstart', (e) => {
+                    e.stopPropagation(); // 防止冒泡
+                    // 觸控時也更新鎚子位置到這裡
+                    if(e.touches.length > 0) {
+                        updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
+                        swingHammer();
+                    }
+                    hitMole(i);
+                }, {passive: false});
+
                 moles.push({ 
                     element: moleEl, 
                     sign: moleEl.querySelector('.mole-sign'), 
@@ -361,13 +398,24 @@
             }
         }
 
-        function moveHammer(e) {
-            hammer.style.left = e.clientX + 'px';
-            hammer.style.top = e.clientY + 'px';
+        // 統一更新鎚子位置與顯示狀態
+        function updateHammerPos(x, y) {
+            hammer.style.opacity = 1; // 顯示鎚子
+            hammer.style.left = x + 'px';
+            hammer.style.top = (y - 50) + 'px'; // 稍微往上偏一點，手指才不會擋住鎚頭
+            
+            // 重置閒置計時器 (2秒沒動就隱藏)
+            if(idleTimer) clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                hammer.style.opacity = 0;
+            }, 2000);
         }
 
         function swingHammer() {
             hammer.classList.add('hammer-hit');
+            // 如果是點擊觸發，重置隱藏計時
+            if(idleTimer) clearTimeout(idleTimer);
+            hammer.style.opacity = 1;
         }
 
         function resetHammer() {
@@ -407,6 +455,7 @@
             clearTimeout(spawnTimer);
             clearAllMoles();
             document.body.style.cursor = 'default';
+            hammer.style.opacity = 0; // 結束時隱藏鎚子
             const modal = document.getElementById('modal');
             modal.style.display = 'flex';
             modal.querySelector('h1').innerText = "遊戲結束";
@@ -558,17 +607,14 @@
             if (!isGameRunning) return;
             const moleObj = moles[idx];
             
-            // 只有冒出來且沒被打過的時候才算
             if (!moleObj.isUp || moleObj.element.classList.contains('hit')) return;
 
-            // 清除縮回計時器，避免它在變臉時突然縮回去判斷 Miss
             if (moleTimers[idx]) clearTimeout(moleTimers[idx]);
 
-            // 視覺回饋
             moleObj.element.classList.add('hit');
             swingHammer();
 
-            // 延遲 0.25秒後縮回 (展示打擊效果)
+            // 延遲 0.25秒後縮回
             setTimeout(() => {
                 retractMole(idx);
             }, 250);
