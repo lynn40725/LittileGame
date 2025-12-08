@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數學打地鼠 - 視覺修復版 V2</title>
+    <title>數學打地鼠 - 最終完美版</title>
     <style>
         :root {
             --primary-color: #FFB347;
             --bg-color: #87CEEB;
-            --mole-bg: #4E342E; /* 更深的洞穴顏色 */
+            --mole-bg: #4E342E;
             --energy-color: #4CAF50;
             --danger-color: #FF5252;
         }
@@ -122,16 +122,16 @@
             border: 5px solid #3E2723;
         }
 
-        /* 地鼠樣式 - 全新配色 (粉嫩肉色) */
+        /* 地鼠樣式 */
         .mole {
             width: 100%;
             height: 100%;
             position: absolute;
-            bottom: -100%; /* 初始位置在洞外 */
+            bottom: -100%; /* 預設藏在下面 */
             left: 0;
-            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             
-            /* 新配色的 SVG */
+            /* 粉色地鼠 */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23E64A19' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23E64A19' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: center bottom;
@@ -145,12 +145,12 @@
         }
 
         .mole.up {
-            bottom: -10px; /* 冒出來的位置 */
+            bottom: -10px; /* 冒出來 */
         }
 
-        /* 被打到的地鼠 SVG (暈倒 + 星星) */
+        /* 被打到的地鼠 */
         .mole.hit {
-            bottom: -10px;
+            bottom: -10px; /* 保持在上面一下下 */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
             transition: bottom 0.1s ease-in;
             pointer-events: none;
@@ -543,6 +543,8 @@
             const moleObj = moles[idx];
             moleObj.isUp = false;
             moleObj.element.classList.remove('up');
+            // 修正：必須移除 'hit' class，否則 CSS 會因為 hit 狀態而讓地鼠保持在 bottom: -10px
+            moleObj.element.classList.remove('hit'); 
         }
 
         function clearAllMoles() {
@@ -555,10 +557,18 @@
         function hitMole(idx) {
             if (!isGameRunning) return;
             const moleObj = moles[idx];
+            
+            // 只有冒出來且沒被打過的時候才算
             if (!moleObj.isUp || moleObj.element.classList.contains('hit')) return;
+
+            // 清除縮回計時器，避免它在變臉時突然縮回去判斷 Miss
+            if (moleTimers[idx]) clearTimeout(moleTimers[idx]);
+
+            // 視覺回饋
             moleObj.element.classList.add('hit');
             swingHammer();
-            if (moleTimers[idx]) clearTimeout(moleTimers[idx]); // 修正：打到後清除縮回計時器
+
+            // 延遲 0.25秒後縮回 (展示打擊效果)
             setTimeout(() => {
                 retractMole(idx);
             }, 250);
