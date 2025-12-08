@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠</title>
+    <title>數學打地鼠 - 可愛地鼠版 V6</title>
     <style>
         :root {
             --primary-color: #FFB347;
@@ -23,7 +23,7 @@
             height: 100vh;
             overflow: hidden;
             user-select: none;
-            cursor: none; /* 隱藏系統鼠標 */
+            cursor: none;
             touch-action: none;
             -webkit-tap-highlight-color: transparent;
         }
@@ -82,10 +82,10 @@
             background: #FFD700;
             border: 5px solid #FF8C00;
             border-radius: 20px;
-            padding: 10px 30px;
-            margin: 15px 0;
+            padding: 5px 30px;
+            margin: 10px 0;
             text-align: center;
-            font-size: 3.5rem; /* 目標數字也放大 */
+            font-size: 3rem;
             font-weight: 900;
             color: #d35400;
             box-shadow: 0 6px 0 #c0392b;
@@ -96,7 +96,7 @@
         }
         
         #target-label {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #333;
             display: block;
             margin-bottom: -5px;
@@ -108,11 +108,11 @@
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px; /* 稍微縮小間距，讓洞可以大一點 */
-            width: 95%; /* 佔寬一點 */
+            gap: 10px; 
+            width: 95%;
             max-width: 500px;
             margin: auto;
-            padding-bottom: 50px;
+            padding-bottom: 60px; /* 預留空間給大看板 */
         }
 
         .hole {
@@ -120,12 +120,14 @@
             border-radius: 50%;
             aspect-ratio: 1;
             position: relative;
-            overflow: hidden;
+            /* overflow: visible;  讓地鼠可以稍微凸出來一點，不被洞口切太死，但為了縮回邏輯還是 hidden 比較安全 */
+            overflow: hidden; 
             box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
             border: 5px solid #281916;
+            z-index: 1;
         }
 
-        /* 地鼠樣式 */
+        /* 地鼠容器 */
         .mole {
             width: 100%;
             height: 100%;
@@ -133,57 +135,70 @@
             bottom: -100%; 
             left: 0;
             transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
             
-            /* 粉色地鼠 */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23BF360C' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23BF360C' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            /* 使用 background-image 繪製可愛地鼠 (包含頭、身體、手) */
+            /* 關鍵：手部繪製在較低位置，準備抓住看板 */
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 90%; /* 地鼠本身也稍微大一點 */
+            background-size: 90%;
             
+            /* 正常狀態 SVG：大眼睛、微笑、雙手舉高 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3C!-- Body --%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3C!-- Belly --%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3C!-- Ears --%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3C!-- Face --%3E%3Cellipse cx='70' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='75' cy='75' r='5' fill='white'/%3E%3Cellipse cx='130' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='135' cy='75' r='5' fill='white'/%3E%3Cellipse cx='100' cy='105' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%233E2723'/%3E%3Cpath d='M100,105 L100,112 M90,112 Q100,120 110,112' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3C!-- Paws (Hands) - 會蓋在看板上 --%3E%3Ccircle cx='30' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C/svg%3E");
+            
+            cursor: none;
             display: flex;
             justify-content: center;
-            align-items: center;
-            cursor: none;
-            z-index: 2;
         }
 
         .mole.up {
-            bottom: -5px; /* 冒出來更多一點 */
+            bottom: -10px; /* 讓地鼠稍微露出洞口一點 */
         }
 
+        /* 被打到的 SVG：暈眩眼 */
         .mole.hit {
-            bottom: -5px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
+            bottom: -20px;
             transition: bottom 0.1s ease-in;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3C!-- Dizzy Eyes --%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='110' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='112' r='8' fill='black'/%3E%3C!-- Paws --%3E%3Ccircle cx='30' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C!-- Stars --%3E%3Cpath d='M30,50 L40,30 L50,50 L30,40 L50,40 Z' fill='%23FFD700'/%3E%3Cpath d='M160,40 L170,20 L180,40 L160,30 L180,30 Z' fill='%23FFD700'/%3E%3C/svg%3E");
             pointer-events: none;
         }
 
-        /* 算式看板 (大幅優化) */
+        /* 看板樣式 */
         .mole-sign {
-            background: #FFF59D; /* 亮黃色便利貼風格 */
-            border: 4px solid #000; /* 加粗邊框 */
-            padding: 2px 4px;
-            border-radius: 10px;
-            
-            /* 字體設定 */
-            font-weight: 900;
-            font-size: 2.3rem; /* 字體加大 */
-            color: #000;
-            font-family: 'Arial Black', sans-serif;
-            white-space: nowrap; /* 強制不換行 */
-            
-            /* 位置設定 */
             position: absolute;
+            bottom: 10%; /* 放在地鼠身體下方 */
             left: 50%;
-            top: 55%; /* 調整垂直位置 */
-            transform: translate(-50%, -50%); /* 絕對置中 */
+            transform: translateX(-50%);
+            width: 140%; /* 比洞口寬，增加氣勢 */
+            height: 70px; /* 足夠放超大字體 */
             
+            /* 木紋質感背景 */
+            background: #FFECB3;
+            border: 4px solid #8D6E63;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            
+            /* 文字設定 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            font-weight: 900;
+            font-family: 'Arial Black', sans-serif;
+            color: #3E2723;
+            white-space: nowrap;
+            
+            /* 讓點擊穿透看板打到地鼠 (雖然現在看板在地鼠div內，但保險起見) */
             pointer-events: none;
-            box-shadow: 0 5px 0 rgba(0,0,0,0.3); /* 立體陰影 */
             z-index: 3;
-            
-            /* 讓牌子寬度適應內容，但不要超過洞太多 */
-            max-width: 140%; 
+        }
+        
+        /* 被打到時看板歪掉 */
+        .mole.hit .mole-sign {
+            transform: translateX(-50%) rotate(15deg) translateY(20px);
+            transition: transform 0.1s ease-in;
+            background: #FFCDD2; /* 變紅色 */
+            border-color: #C62828;
         }
 
         /* 鎚子 */
@@ -211,7 +226,7 @@
         .float-text {
             position: absolute;
             font-weight: 900;
-            font-size: 2.5rem; /* 獎勵文字也加大 */
+            font-size: 2.5rem;
             color: #ff0000;
             pointer-events: none;
             animation: floatUp 0.8s forwards;
@@ -359,12 +374,10 @@
         const hammer = document.getElementById('hammer');
 
         function init() {
-            // 滑鼠事件
             document.addEventListener('mousemove', (e) => updateHammerPos(e.clientX, e.clientY));
             document.addEventListener('mousedown', swingHammer);
             document.addEventListener('mouseup', resetHammer);
 
-            // 觸控事件
             document.addEventListener('touchstart', (e) => {
                 if(e.touches.length > 0) {
                     updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
@@ -378,17 +391,14 @@
                 }
             }, {passive: false});
             
-            // 綁定地鼠點擊
             for(let i=0; i<9; i++) {
                 const moleEl = document.getElementById(`mole-${i}`);
                 
-                // 滑鼠點擊
                 moleEl.addEventListener('mousedown', (e) => {
                     e.stopPropagation(); 
                     hitMole(i);
                 });
 
-                // 觸控點擊
                 moleEl.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -412,7 +422,6 @@
             hammer.style.opacity = 1;
             hammer.style.left = x + 'px';
             hammer.style.top = (y - 50) + 'px';
-            
             if(idleTimer) clearTimeout(idleTimer);
             idleTimer = setTimeout(() => {
                 hammer.style.opacity = 0;
@@ -474,11 +483,10 @@
             let min, max;
             let validTarget = false;
             let tempTarget = 0;
-            
-            if (level <= 3) { min = 6; max = 81; } 
-            else if (level <= 6) { min = 20; max = 150; } 
-            else if (level <= 9) { min = 150; max = 500; } 
-            else { min = 1000; max = 3000; } 
+            if (level <= 3) { min = 6; max = 81; }
+            else if (level <= 6) { min = 20; max = 150; }
+            else if (level <= 9) { min = 150; max = 500; }
+            else { min = 1000; max = 3000; }
 
             while (!validTarget) {
                 tempTarget = Math.floor(Math.random() * (max - min + 1)) + min;
