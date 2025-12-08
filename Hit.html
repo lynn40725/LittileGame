@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠 - 觸控優化版 V3</title>
+    <title>數學打地鼠</title>
     <style>
         :root {
             --primary-color: #FFB347;
             --bg-color: #87CEEB;
-            --mole-bg: #4E342E;
+            --mole-bg: #3E2723;
             --energy-color: #4CAF50;
             --danger-color: #FF5252;
         }
@@ -24,8 +24,7 @@
             overflow: hidden;
             user-select: none;
             cursor: none; /* 隱藏系統鼠標 */
-            /* 關鍵：禁止觸控時的滾動與縮放 */
-            touch-action: none; 
+            touch-action: none;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -81,22 +80,23 @@
         /* 目標看板 */
         #target-board {
             background: #FFD700;
-            border: 4px solid #FF8C00;
+            border: 5px solid #FF8C00;
             border-radius: 20px;
             padding: 10px 30px;
             margin: 15px 0;
             text-align: center;
-            font-size: 3rem;
+            font-size: 3.5rem; /* 目標數字也放大 */
             font-weight: 900;
             color: #d35400;
             box-shadow: 0 6px 0 #c0392b;
             position: relative;
             animation: bounceIn 0.5s;
             text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+            z-index: 5;
         }
         
         #target-label {
-            font-size: 1rem;
+            font-size: 1.2rem;
             color: #333;
             display: block;
             margin-bottom: -5px;
@@ -108,9 +108,9 @@
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            width: 90%;
-            max-width: 450px;
+            gap: 15px; /* 稍微縮小間距，讓洞可以大一點 */
+            width: 95%; /* 佔寬一點 */
+            max-width: 500px;
             margin: auto;
             padding-bottom: 50px;
         }
@@ -121,8 +121,8 @@
             aspect-ratio: 1;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 10px 15px rgba(0,0,0,0.6);
-            border: 5px solid #3E2723;
+            box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
+            border: 5px solid #281916;
         }
 
         /* 地鼠樣式 */
@@ -134,11 +134,11 @@
             left: 0;
             transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             
-            /* 粉色地鼠 SVG */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23E64A19' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23E64A19' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            /* 粉色地鼠 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,100 C160,50 120,20 100,20 C80,20 40,50 40,100 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,100 Q100,130 140,100' fill='none' stroke='%23BF360C' stroke-width='3' opacity='0.3'/%3E%3Cellipse cx='70' cy='80' rx='10' ry='15' fill='black'/%3E%3Cellipse cx='130' cy='80' rx='10' ry='15' fill='black'/%3E%3Ccircle cx='75' cy='75' r='4' fill='white'/%3E%3Ccircle cx='135' cy='75' r='4' fill='white'/%3E%3Cellipse cx='100' cy='110' rx='25' ry='15' fill='%23FFAB91'/%3E%3Cpath d='M90,110 Q100,120 110,110' stroke='%23BF360C' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 85%;
+            background-size: 90%; /* 地鼠本身也稍微大一點 */
             
             display: flex;
             justify-content: center;
@@ -148,30 +148,42 @@
         }
 
         .mole.up {
-            bottom: -10px;
+            bottom: -5px; /* 冒出來更多一點 */
         }
 
-        /* 被打到的地鼠 */
         .mole.hit {
-            bottom: -10px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%23FFCCBC' stroke='%23E64A19' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
+            bottom: -5px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40,200 L160,200 L160,110 C160,60 120,30 100,30 C80,30 40,60 40,110 Z' fill='%23FFCCBC' stroke='%23BF360C' stroke-width='5'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='120' rx='20' ry='25' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='125' r='10' fill='black'/%3E%3Cpath d='M30,50 L50,30 L70,50 L50,70 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3Cpath d='M150,40 L170,20 L190,40 L170,60 Z' fill='%23FFD700' stroke='%23FFA000' stroke-width='2'/%3E%3C/svg%3E");
             transition: bottom 0.1s ease-in;
             pointer-events: none;
         }
 
+        /* 算式看板 (大幅優化) */
         .mole-sign {
-            background: white;
-            border: 3px solid #333;
-            padding: 5px 12px;
+            background: #FFF59D; /* 亮黃色便利貼風格 */
+            border: 4px solid #000; /* 加粗邊框 */
+            padding: 2px 4px;
             border-radius: 10px;
+            
+            /* 字體設定 */
             font-weight: 900;
-            font-size: 1.4rem;
+            font-size: 2.3rem; /* 字體加大 */
             color: #000;
-            margin-top: 60px;
-            pointer-events: none;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
             font-family: 'Arial Black', sans-serif;
+            white-space: nowrap; /* 強制不換行 */
+            
+            /* 位置設定 */
+            position: absolute;
+            left: 50%;
+            top: 55%; /* 調整垂直位置 */
+            transform: translate(-50%, -50%); /* 絕對置中 */
+            
+            pointer-events: none;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.3); /* 立體陰影 */
             z-index: 3;
+            
+            /* 讓牌子寬度適應內容，但不要超過洞太多 */
+            max-width: 140%; 
         }
 
         /* 鎚子 */
@@ -187,8 +199,8 @@
             background-size: contain;
             background-repeat: no-repeat;
             transform: translate(-30%, -30%) rotate(0deg);
-            transition: transform 0.05s, opacity 0.3s; /* 增加透明度過渡 */
-            opacity: 0; /* 初始隱藏，動了才出現 */
+            transition: transform 0.05s, opacity 0.3s;
+            opacity: 0;
         }
 
         #hammer.hammer-hit {
@@ -199,12 +211,12 @@
         .float-text {
             position: absolute;
             font-weight: 900;
-            font-size: 2rem;
+            font-size: 2.5rem; /* 獎勵文字也加大 */
             color: #ff0000;
             pointer-events: none;
             animation: floatUp 0.8s forwards;
-            z-index: 20;
-            text-shadow: 2px 2px 0 #fff;
+            z-index: 99999;
+            text-shadow: 3px 3px 0 #fff;
             font-family: 'Arial Black', sans-serif;
             white-space: nowrap;
         }
@@ -333,7 +345,7 @@
         let moles = []; 
         let spawnTimer = null;
         let moleTimers = []; 
-        let idleTimer = null; // 閒置計時器
+        let idleTimer = null;
         
         const REQUIRED_HITS_SWITCH = 3; 
         const HITS_TO_LEVEL_UP = 10; 
@@ -352,9 +364,8 @@
             document.addEventListener('mousedown', swingHammer);
             document.addEventListener('mouseup', resetHammer);
 
-            // 觸控事件 (平板/手機優化)
+            // 觸控事件
             document.addEventListener('touchstart', (e) => {
-                // e.preventDefault(); // 防止滾動，但在某些瀏覽器可能影響點擊，這裡用 CSS touch-action 處理
                 if(e.touches.length > 0) {
                     updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
                     swingHammer();
@@ -362,7 +373,6 @@
             }, {passive: false});
 
             document.addEventListener('touchmove', (e) => {
-                // e.preventDefault(); 
                 if(e.touches.length > 0) {
                     updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
                 }
@@ -378,10 +388,10 @@
                     hitMole(i);
                 });
 
-                // 觸控點擊 (直接綁定 touchstart 以獲得最快反應)
+                // 觸控點擊
                 moleEl.addEventListener('touchstart', (e) => {
-                    e.stopPropagation(); // 防止冒泡
-                    // 觸控時也更新鎚子位置到這裡
+                    e.preventDefault();
+                    e.stopPropagation();
                     if(e.touches.length > 0) {
                         updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
                         swingHammer();
@@ -398,13 +408,11 @@
             }
         }
 
-        // 統一更新鎚子位置與顯示狀態
         function updateHammerPos(x, y) {
-            hammer.style.opacity = 1; // 顯示鎚子
+            hammer.style.opacity = 1;
             hammer.style.left = x + 'px';
-            hammer.style.top = (y - 50) + 'px'; // 稍微往上偏一點，手指才不會擋住鎚頭
+            hammer.style.top = (y - 50) + 'px';
             
-            // 重置閒置計時器 (2秒沒動就隱藏)
             if(idleTimer) clearTimeout(idleTimer);
             idleTimer = setTimeout(() => {
                 hammer.style.opacity = 0;
@@ -413,7 +421,6 @@
 
         function swingHammer() {
             hammer.classList.add('hammer-hit');
-            // 如果是點擊觸發，重置隱藏計時
             if(idleTimer) clearTimeout(idleTimer);
             hammer.style.opacity = 1;
         }
@@ -455,7 +462,7 @@
             clearTimeout(spawnTimer);
             clearAllMoles();
             document.body.style.cursor = 'default';
-            hammer.style.opacity = 0; // 結束時隱藏鎚子
+            hammer.style.opacity = 0;
             const modal = document.getElementById('modal');
             modal.style.display = 'flex';
             modal.querySelector('h1').innerText = "遊戲結束";
@@ -467,10 +474,11 @@
             let min, max;
             let validTarget = false;
             let tempTarget = 0;
-            if (level <= 3) { min = 6; max = 81; }
-            else if (level <= 6) { min = 20; max = 150; }
-            else if (level <= 9) { min = 100; max = 400; }
-            else { min = 300; max = 999; }
+            
+            if (level <= 3) { min = 6; max = 81; } 
+            else if (level <= 6) { min = 20; max = 150; } 
+            else if (level <= 9) { min = 150; max = 500; } 
+            else { min = 1000; max = 3000; } 
 
             while (!validTarget) {
                 tempTarget = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -508,6 +516,8 @@
                             if(i*i !== target) factors.push(target/i);
                         }
                     }
+                    if(factors.length === 0) factors.push(1);
+                    
                     let f1 = factors[Math.floor(Math.random() * factors.length)];
                     let f2 = target / f1;
                     equation = Math.random() > 0.5 ? `${f1} x ${f2}` : `${f2} x ${f1}`;
@@ -592,7 +602,6 @@
             const moleObj = moles[idx];
             moleObj.isUp = false;
             moleObj.element.classList.remove('up');
-            // 修正：必須移除 'hit' class，否則 CSS 會因為 hit 狀態而讓地鼠保持在 bottom: -10px
             moleObj.element.classList.remove('hit'); 
         }
 
@@ -614,7 +623,6 @@
             moleObj.element.classList.add('hit');
             swingHammer();
 
-            // 延遲 0.25秒後縮回
             setTimeout(() => {
                 retractMole(idx);
             }, 250);
