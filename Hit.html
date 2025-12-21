@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠 - v15</title>
-   <style>
+    <title>數學打地鼠 - V16</title>
+    <style>
         :root {
             --primary-color: #FFB347;
             --bg-color: #87CEEB;
@@ -17,45 +17,44 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            /* 關鍵：使用 Flexbox 讓內容在任何螢幕都置中 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            /* 讓 body 佔滿整個視窗，禁止捲動 */
+            height: 100vh; 
             width: 100vw;
-            overflow: hidden; /* 禁止滾動 */
+            overflow: hidden; 
             user-select: none;
-            cursor: none; /* 隱藏游標 */
+            cursor: none;
             touch-action: none;
             -webkit-tap-highlight-color: transparent;
+            display: flex;
+            justify-content: center;
         }
 
         #game-container {
             position: relative;
             width: 100%;
+            max-width: 800px; /* 稍微放寬最大寬度 */
             height: 100%;
+            /* 關鍵：使用 Column 佈局 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* 從頂部開始排 */
-            padding-top: 2vh; /* 頂部留一點空間 */
+            padding: 10px;
             box-sizing: border-box;
         }
 
-        /* HUD */
+        /* HUD - 固定高度區域 */
         #hud {
-            width: 90%;
-            max-width: 600px; /* 電腦版最大寬度 */
+            width: 95%;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 10px;
+            padding: 8px 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 2px;
             z-index: 10;
-            flex-shrink: 0; /* 防止被壓縮 */
+            /* 防止被壓縮 */
+            flex-shrink: 0; 
         }
 
         .hud-row {
@@ -63,13 +62,13 @@
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #333;
         }
 
         #energy-bar-container {
             width: 100%;
-            height: 15px;
+            height: 12px;
             background: #ddd;
             border-radius: 10px;
             overflow: hidden;
@@ -83,63 +82,72 @@
             transition: width 0.2s, background 0.2s;
         }
 
-        /* 目標看板 */
+        /* 目標看板 - 固定高度區域 */
         #target-board {
             background: #FFD700;
             border: 5px solid #FF8C00;
-            border-radius: 20px;
-            padding: 0.5vh 4vw; /* 使用相對單位 */
-            margin: 2vh 0;      /* 上下間距自適應 */
+            border-radius: 15px;
+            padding: 5px 30px;
+            margin: 10px 0; /* 給一點呼吸空間 */
             text-align: center;
-            /* 字體大小使用 vmin，隨螢幕大小縮放 */
-            font-size: 8vmin; 
+            font-size: 3rem;
             font-weight: 900;
             color: #d35400;
-            box-shadow: 0 6px 0 #c0392b;
+            box-shadow: 0 4px 0 #c0392b;
             position: relative;
             animation: bounceIn 0.5s;
             text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
             z-index: 5;
-            flex-shrink: 0;
-            min-width: 120px;
+            flex-shrink: 0; /* 防止被壓縮 */
+            line-height: 1.1;
         }
         
         #target-label {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #333;
             display: block;
-            margin-bottom: -5px;
+            margin-bottom: -2px;
             text-shadow: none;
             font-weight: normal;
         }
 
-        /* 網格 - RWD 核心 */
+        /* 遊戲網格區域 - 彈性伸縮區域 */
+        #grid-area {
+            /* 佔據剩餘所有空間 */
+            flex-grow: 1; 
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* 垂直置中 */
+            overflow: hidden; /* 防止內容溢出 */
+            position: relative;
+        }
+
+        /* 實際網格 */
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 2vmin; /* 間距隨螢幕縮放 */
+            gap: 15px;
+            /* 關鍵：確保網格保持正方形，且不超出父容器的寬或高 */
+            aspect-ratio: 1 / 1;
+            height: auto;
+            width: auto;
+            max-height: 100%; /* 高度不超過父容器 */
+            max-width: 100%;  /* 寬度不超過父容器 */
             
-            /* 關鍵：讓網格大小根據螢幕「短邊」決定 */
-            width: 90vmin; 
-            height: 90vmin;
-            max-width: 500px; /* 電腦版最大限制 */
-            max-height: 500px;
-            
-            margin: 0 auto;
-            /* 讓網格在剩餘空間中盡量大 */
-            flex-grow: 1; 
-            align-content: center; /* 內容置中 */
+            /* 在橫屏手機上，讓它盡可能大 */
+            min-height: 0; 
+            min-width: 0;
         }
 
         .hole {
             background: var(--mole-bg);
             border-radius: 50%;
             width: 100%;
-            height: 100%; /* 確保填滿 grid cell */
-            aspect-ratio: 1; /* 強制正圓 */
+            height: 100%; /* 填滿格子 */
             position: relative;
-            overflow: hidden; 
-            box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
+            overflow: hidden;
+            box-shadow: inset 0 8px 12px rgba(0,0,0,0.8);
             border: 4px solid #281916;
             z-index: 1;
         }
@@ -149,17 +157,15 @@
             width: 100%;
             height: 100%;
             position: absolute;
-            bottom: -100%; 
+            bottom: -100%;
             left: 0;
-            transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 2;
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 85%; /* 身體稍微縮小，讓看板不切邊 */
-            
-            /* 使用 V12 正確的可愛地鼠 SVG */
+            background-size: 90%;
+            /* 可愛棕色地鼠 SVG */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cellipse cx='70' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='75' cy='75' r='5' fill='white'/%3E%3Cellipse cx='130' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='135' cy='75' r='5' fill='white'/%3E%3Cellipse cx='100' cy='105' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%233E2723'/%3E%3Cpath d='M100,105 L100,112 M90,112 Q100,120 110,112' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3Ccircle cx='30' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C/svg%3E");
-            
             cursor: none;
             display: flex;
             justify-content: center;
@@ -172,46 +178,48 @@
         .mole.hit {
             bottom: -15px;
             transition: bottom 0.1s ease-in;
-            /* 使用 V12 正確的暈眩地鼠 SVG */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='110' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='112' r='8' fill='black'/%3E%3Ccircle cx='30' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Cpath d='M30,50 L40,30 L50,50 L30,40 L50,40 Z' fill='%23FFD700'/%3E%3Cpath d='M160,40 L170,20 L180,40 L160,30 L180,30 Z' fill='%23FFD700'/%3E%3C/svg%3E");
             pointer-events: none;
         }
 
-        /* 看板樣式 - RWD */
+        /* 看板樣式 - 使用 vw/vh 確保比例 */
         .mole-sign {
             position: absolute;
-            bottom: 12%; 
+            bottom: 12%;
             left: 50%;
             transform: translateX(-50%);
-            width: 94%; /* 稍微留邊，避免數字切到洞口邊緣 */
-            height: 38%; /* 相對高度 */
+            width: 96%;
+            height: 38%;
             background: #FFECB3;
-            border: 4px solid #3E2723;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            
+            border: 3px solid #3E2723;
+            border-radius: 10px;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.3);
             display: flex;
             justify-content: center;
             align-items: center;
-            
-            /* 預設字體 (JS 會動態修改) */
-            font-size: 2.2rem; 
-            font-weight: 900;
-            font-family: 'Arial Black', sans-serif;
             color: #000;
             white-space: nowrap;
             pointer-events: none;
             z-index: 3;
             box-sizing: border-box;
+            
+            /* 使用容器查詢單位的概念，讓字體隨框大小變化 */
+            font-size: 2.2rem;
+            font-weight: 900;
+            font-family: 'Arial Black', sans-serif;
         }
         
+        .mole-sign.small-text {
+            font-size: 1.5rem !important;
+        }
+
         .mole.hit .mole-sign {
             transform: translateX(-50%) rotate(10deg) translateY(10px);
             background: #FFCDD2;
             border-color: #C62828;
         }
 
-        /* 鎚子 - 自適應大小 */
+        /* 鎚子 */
         #hammer {
             position: fixed;
             top: 0;
@@ -312,20 +320,39 @@
             transform: translateY(4px);
         }
 
-        /* RWD: 手機版字體微調 */
-        @media (max-width: 600px) {
+        /* 媒體查詢：針對高度較小的螢幕 (橫向手機) */
+        @media (max-height: 600px) {
             #target-board {
-                font-size: 10vw; /* 目標數字在手機上更大 */
-                padding: 5px 20px;
-                margin: 1vh 0;
+                margin: 5px 0;
+                padding: 2px 20px;
+                font-size: 2rem;
+            }
+            #hud {
+                padding: 5px 15px;
             }
             .hud-row {
                 font-size: 1rem;
             }
-            /* 預設小螢幕字體 */
+            #grid {
+                gap: 8px;
+            }
+            /* 字體也要跟著縮小，否則會撐爆 */
             .mole-sign {
-                font-size: 1.5rem; 
-                border-width: 3px;
+                font-size: 1.5rem;
+                height: 45%; /* 橫屏稍微高一點 */
+            }
+            .mole-sign.small-text {
+                font-size: 1.1rem !important;
+            }
+        }
+
+        /* 媒體查詢：針對寬度較小的螢幕 (直向手機) */
+        @media (max-width: 600px) {
+            .mole-sign {
+                font-size: 1.6rem;
+            }
+            .mole-sign.small-text {
+                font-size: 1.2rem !important;
             }
         }
 
@@ -344,7 +371,7 @@
             <div id="energy-bar-container">
                 <div id="energy-bar"></div>
             </div>
-            <div class="hud-row" style="font-size: 1rem; color: #666; margin-top:5px;">
+            <div class="hud-row" style="font-size: 1rem; color: #666; margin-top:2px;">
                 <span id="combo-display">Combo: 0</span>
             </div>
         </div>
@@ -354,16 +381,18 @@
             <span id="target-number">??</span>
         </div>
 
-        <div id="grid">
-            <div class="hole"><div class="mole" id="mole-0"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-1"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-2"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-3"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-4"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-5"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-6"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-7"><div class="mole-sign"></div></div></div>
-            <div class="hole"><div class="mole" id="mole-8"><div class="mole-sign"></div></div></div>
+        <div id="grid-area">
+            <div id="grid">
+                <div class="hole"><div class="mole" id="mole-0"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-1"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-2"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-3"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-4"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-5"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-6"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-7"><div class="mole-sign"></div></div></div>
+                <div class="hole"><div class="mole" id="mole-8"><div class="mole-sign"></div></div></div>
+            </div>
         </div>
     </div>
 
@@ -635,12 +664,11 @@
             moleObj.isCorrect = isCorrect;
             moleObj.sign.innerText = text;
             
-            // 關鍵修改：動態字體縮放邏輯
-            // 如果是長算式 (例如 "12 x 12" 長度大於 5)，縮小字體
+            // 判斷算式長度調整字體
             if (text.length > 5) {
-                moleObj.sign.style.fontSize = '1.6rem'; 
+                moleObj.sign.classList.add('small-text');
             } else {
-                moleObj.sign.style.fontSize = '2.2rem';
+                moleObj.sign.classList.remove('small-text');
             }
 
             moleObj.element.classList.remove('hit');
