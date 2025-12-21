@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠 - V16</title>
+    <title>數學打地鼠 - V17</title>
     <style>
         :root {
             --primary-color: #FFB347;
@@ -17,44 +17,46 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            /* 讓 body 佔滿整個視窗，禁止捲動 */
-            height: 100vh; 
+            /* 讓內容垂直水平置中 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             width: 100vw;
-            overflow: hidden; 
+            overflow: hidden; /* 絕對禁止滾動 */
             user-select: none;
-            cursor: none;
+            cursor: none; /* 隱藏游標 */
             touch-action: none;
             -webkit-tap-highlight-color: transparent;
-            display: flex;
-            justify-content: center;
         }
 
         #game-container {
             position: relative;
             width: 100%;
-            max-width: 800px; /* 稍微放寬最大寬度 */
             height: 100%;
-            /* 關鍵：使用 Column 佈局 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            justify-content: flex-start;
             box-sizing: border-box;
+            padding-top: 10px;
         }
 
-        /* HUD - 固定高度區域 */
+        /* HUD - 頂部資訊列 */
         #hud {
-            width: 95%;
+            width: 90%;
+            max-width: 600px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 8px 15px;
+            margin-bottom: 5px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             gap: 2px;
             z-index: 10;
-            /* 防止被壓縮 */
-            flex-shrink: 0; 
+            flex-shrink: 0; /* 禁止被壓縮 */
         }
 
         .hud-row {
@@ -82,89 +84,106 @@
             transition: width 0.2s, background 0.2s;
         }
 
-        /* 目標看板 - 固定高度區域 */
+        /* 目標看板 */
         #target-board {
             background: #FFD700;
             border: 5px solid #FF8C00;
-            border-radius: 15px;
-            padding: 5px 30px;
-            margin: 10px 0; /* 給一點呼吸空間 */
+            border-radius: 20px;
+            padding: 2px 30px;
+            margin: 5px 0 10px 0;
             text-align: center;
             font-size: 3rem;
             font-weight: 900;
             color: #d35400;
-            box-shadow: 0 4px 0 #c0392b;
+            box-shadow: 0 5px 0 #c0392b;
             position: relative;
             animation: bounceIn 0.5s;
             text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
             z-index: 5;
-            flex-shrink: 0; /* 防止被壓縮 */
-            line-height: 1.1;
+            flex-shrink: 0; /* 禁止被壓縮 */
+            line-height: 1.2;
         }
         
         #target-label {
             font-size: 0.9rem;
             color: #333;
             display: block;
-            margin-bottom: -2px;
+            margin-bottom: -5px;
             text-shadow: none;
             font-weight: normal;
         }
 
-        /* 遊戲網格區域 - 彈性伸縮區域 */
-        #grid-area {
-            /* 佔據剩餘所有空間 */
-            flex-grow: 1; 
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center; /* 垂直置中 */
-            overflow: hidden; /* 防止內容溢出 */
-            position: relative;
-        }
-
-        /* 實際網格 */
+        /* 網格區域 - 核心佈局修正 */
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            /* 關鍵：確保網格保持正方形，且不超出父容器的寬或高 */
-            aspect-ratio: 1 / 1;
-            height: auto;
-            width: auto;
-            max-height: 100%; /* 高度不超過父容器 */
-            max-width: 100%;  /* 寬度不超過父容器 */
             
-            /* 在橫屏手機上，讓它盡可能大 */
-            min-height: 0; 
-            min-width: 0;
+            /* 計算公式：
+               1. 預設寬度 90vw (手機直立)
+               2. 但高度不能超過「螢幕總高 - 上方看板區(約180px)」
+               3. 並且最大不超過 600px (電腦版限制)
+            */
+            width: 90vw;
+            height: 90vw;
+            
+            max-width: 600px;
+            max-height: 600px;
+            
+            /* 關鍵：如果高度不夠，就改用高度來決定大小 */
+            /* 100vh - 180px 是留給 HUD 和 看板 的空間 */
+            max-width: calc(100vh - 180px);
+            max-height: calc(100vh - 180px);
+
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* 橫屏手機特別優化 */
+        @media (max-height: 500px) {
+            #grid {
+                /* 空間更少，要扣更多一點或是縮小間距 */
+                gap: 8px;
+                max-width: calc(100vh - 110px);
+                max-height: calc(100vh - 110px);
+            }
+            #target-board {
+                font-size: 2rem; /* 字縮小 */
+                margin: 2px 0;
+                padding: 0 20px;
+            }
+            #hud {
+                padding: 4px 15px;
+            }
+            .hud-row {
+                font-size: 0.9rem;
+            }
         }
 
         .hole {
             background: var(--mole-bg);
             border-radius: 50%;
             width: 100%;
-            height: 100%; /* 填滿格子 */
+            height: 100%;
             position: relative;
-            overflow: hidden;
+            overflow: hidden; 
             box-shadow: inset 0 8px 12px rgba(0,0,0,0.8);
             border: 4px solid #281916;
             z-index: 1;
         }
 
-        /* 地鼠容器 */
+        /* 地鼠容器 - 使用您指定的可愛棕色版 */
         .mole {
             width: 100%;
             height: 100%;
             position: absolute;
-            bottom: -100%;
+            bottom: -100%; 
             left: 0;
-            transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             z-index: 2;
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 90%;
-            /* 可愛棕色地鼠 SVG */
+            background-size: 90%; 
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cellipse cx='70' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='75' cy='75' r='5' fill='white'/%3E%3Cellipse cx='130' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='135' cy='75' r='5' fill='white'/%3E%3Cellipse cx='100' cy='105' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%233E2723'/%3E%3Cpath d='M100,105 L100,112 M90,112 Q100,120 110,112' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3Ccircle cx='30' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C/svg%3E");
             cursor: none;
             display: flex;
@@ -182,37 +201,32 @@
             pointer-events: none;
         }
 
-        /* 看板樣式 - 使用 vw/vh 確保比例 */
+        /* 看板樣式 */
         .mole-sign {
             position: absolute;
-            bottom: 12%;
+            bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 96%;
+            width: 96%; 
             height: 38%;
             background: #FFECB3;
-            border: 3px solid #3E2723;
+            border: 4px solid #3E2723;
             border-radius: 10px;
-            box-shadow: 0 4px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 使用容器單位 cqmin (如果支援) 或 vmin 來做字體縮放，這裡用 calc vmin 保底 */
+            font-size: 5vmin; /* 字體隨螢幕大小縮放 */
+            font-weight: 900;
+            font-family: 'Arial Black', sans-serif;
             color: #000;
             white-space: nowrap;
             pointer-events: none;
             z-index: 3;
             box-sizing: border-box;
-            
-            /* 使用容器查詢單位的概念，讓字體隨框大小變化 */
-            font-size: 2.2rem;
-            font-weight: 900;
-            font-family: 'Arial Black', sans-serif;
         }
         
-        .mole-sign.small-text {
-            font-size: 1.5rem !important;
-        }
-
         .mole.hit .mole-sign {
             transform: translateX(-50%) rotate(10deg) translateY(10px);
             background: #FFCDD2;
@@ -244,7 +258,7 @@
         .float-text {
             position: absolute;
             font-weight: 900;
-            font-size: 2rem;
+            font-size: 5vmin;
             color: #ff0000;
             pointer-events: none;
             animation: floatUp 0.8s forwards;
@@ -320,42 +334,6 @@
             transform: translateY(4px);
         }
 
-        /* 媒體查詢：針對高度較小的螢幕 (橫向手機) */
-        @media (max-height: 600px) {
-            #target-board {
-                margin: 5px 0;
-                padding: 2px 20px;
-                font-size: 2rem;
-            }
-            #hud {
-                padding: 5px 15px;
-            }
-            .hud-row {
-                font-size: 1rem;
-            }
-            #grid {
-                gap: 8px;
-            }
-            /* 字體也要跟著縮小，否則會撐爆 */
-            .mole-sign {
-                font-size: 1.5rem;
-                height: 45%; /* 橫屏稍微高一點 */
-            }
-            .mole-sign.small-text {
-                font-size: 1.1rem !important;
-            }
-        }
-
-        /* 媒體查詢：針對寬度較小的螢幕 (直向手機) */
-        @media (max-width: 600px) {
-            .mole-sign {
-                font-size: 1.6rem;
-            }
-            .mole-sign.small-text {
-                font-size: 1.2rem !important;
-            }
-        }
-
     </style>
 </head>
 <body>
@@ -381,18 +359,16 @@
             <span id="target-number">??</span>
         </div>
 
-        <div id="grid-area">
-            <div id="grid">
-                <div class="hole"><div class="mole" id="mole-0"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-1"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-2"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-3"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-4"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-5"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-6"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-7"><div class="mole-sign"></div></div></div>
-                <div class="hole"><div class="mole" id="mole-8"><div class="mole-sign"></div></div></div>
-            </div>
+        <div id="grid">
+            <div class="hole"><div class="mole" id="mole-0"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-1"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-2"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-3"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-4"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-5"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-6"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-7"><div class="mole-sign"></div></div></div>
+            <div class="hole"><div class="mole" id="mole-8"><div class="mole-sign"></div></div></div>
         </div>
     </div>
 
@@ -664,11 +640,11 @@
             moleObj.isCorrect = isCorrect;
             moleObj.sign.innerText = text;
             
-            // 判斷算式長度調整字體
+            // 字體自動縮放：如果算式太長，縮小字體
             if (text.length > 5) {
-                moleObj.sign.classList.add('small-text');
+                moleObj.sign.style.fontSize = '3.5vmin'; 
             } else {
-                moleObj.sign.classList.remove('small-text');
+                moleObj.sign.style.fontSize = '5vmin';
             }
 
             moleObj.element.classList.remove('hit');
