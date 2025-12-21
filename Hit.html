@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠 - V14</title>
-    <style>
+    <title>數學打地鼠 - v15</title>
+   <style>
         :root {
             --primary-color: #FFB347;
             --bg-color: #87CEEB;
@@ -17,45 +17,45 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
+            /* 關鍵：使用 Flexbox 讓內容在任何螢幕都置中 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* 垂直置中 */
+            justify-content: center;
             height: 100vh;
             width: 100vw;
-            overflow: hidden;
+            overflow: hidden; /* 禁止滾動 */
             user-select: none;
             cursor: none; /* 隱藏游標 */
-            touch-action: none; /* 禁止拖曳滾動 */
+            touch-action: none;
             -webkit-tap-highlight-color: transparent;
         }
 
         #game-container {
             position: relative;
             width: 100%;
-            max-width: 600px; /* 電腦版最大寬度 */
             height: 100%;
-            max-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding-top: 10px;
+            justify-content: flex-start; /* 從頂部開始排 */
+            padding-top: 2vh; /* 頂部留一點空間 */
+            box-sizing: border-box;
         }
 
         /* HUD */
         #hud {
             width: 90%;
+            max-width: 600px; /* 電腦版最大寬度 */
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 10px;
-            margin-top: 5px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             gap: 5px;
             z-index: 10;
-            flex-shrink: 0;
+            flex-shrink: 0; /* 防止被壓縮 */
         }
 
         .hud-row {
@@ -83,15 +83,16 @@
             transition: width 0.2s, background 0.2s;
         }
 
-        /* 目標看板 - 使用相對單位 */
+        /* 目標看板 */
         #target-board {
             background: #FFD700;
             border: 5px solid #FF8C00;
             border-radius: 20px;
-            padding: 1vh 4vw; /* 自適應 Padding */
-            margin: 2vh 0;    /* 自適應 Margin */
+            padding: 0.5vh 4vw; /* 使用相對單位 */
+            margin: 2vh 0;      /* 上下間距自適應 */
             text-align: center;
-            font-size: 3.5rem; /* 預設大字 */
+            /* 字體大小使用 vmin，隨螢幕大小縮放 */
+            font-size: 8vmin; 
             font-weight: 900;
             color: #d35400;
             box-shadow: 0 6px 0 #c0392b;
@@ -100,6 +101,7 @@
             text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
             z-index: 5;
             flex-shrink: 0;
+            min-width: 120px;
         }
         
         #target-label {
@@ -115,21 +117,26 @@
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px; 
-            width: 90%;
-            max-width: 500px;
-            /* 讓網格盡量佔滿剩餘空間，保持正方形 */
-            aspect-ratio: 1 / 1; 
+            gap: 2vmin; /* 間距隨螢幕縮放 */
+            
+            /* 關鍵：讓網格大小根據螢幕「短邊」決定 */
+            width: 90vmin; 
+            height: 90vmin;
+            max-width: 500px; /* 電腦版最大限制 */
+            max-height: 500px;
+            
             margin: 0 auto;
-            padding-bottom: 20px;
-            flex-shrink: 1; /* 允許縮小以適應螢幕 */
+            /* 讓網格在剩餘空間中盡量大 */
+            flex-grow: 1; 
+            align-content: center; /* 內容置中 */
         }
 
         .hole {
             background: var(--mole-bg);
             border-radius: 50%;
             width: 100%;
-            height: 100%;
+            height: 100%; /* 確保填滿 grid cell */
+            aspect-ratio: 1; /* 強制正圓 */
             position: relative;
             overflow: hidden; 
             box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
@@ -137,7 +144,7 @@
             z-index: 1;
         }
 
-        /* 地鼠容器 - 可愛棕色版 SVG */
+        /* 地鼠容器 */
         .mole {
             width: 100%;
             height: 100%;
@@ -148,8 +155,11 @@
             z-index: 2;
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 90%; 
+            background-size: 85%; /* 身體稍微縮小，讓看板不切邊 */
+            
+            /* 使用 V12 正確的可愛地鼠 SVG */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cellipse cx='70' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='75' cy='75' r='5' fill='white'/%3E%3Cellipse cx='130' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='135' cy='75' r='5' fill='white'/%3E%3Cellipse cx='100' cy='105' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%233E2723'/%3E%3Cpath d='M100,105 L100,112 M90,112 Q100,120 110,112' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3Ccircle cx='30' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C/svg%3E");
+            
             cursor: none;
             display: flex;
             justify-content: center;
@@ -162,18 +172,19 @@
         .mole.hit {
             bottom: -15px;
             transition: bottom 0.1s ease-in;
+            /* 使用 V12 正確的暈眩地鼠 SVG */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cpath d='M60,70 L80,90 M80,70 L60,90' stroke='black' stroke-width='4'/%3E%3Cpath d='M120,70 L140,90 M140,70 L120,90' stroke='black' stroke-width='4'/%3E%3Cellipse cx='100' cy='110' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='112' r='8' fill='black'/%3E%3Ccircle cx='30' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='170' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Cpath d='M30,50 L40,30 L50,50 L30,40 L50,40 Z' fill='%23FFD700'/%3E%3Cpath d='M160,40 L170,20 L180,40 L160,30 L180,30 Z' fill='%23FFD700'/%3E%3C/svg%3E");
             pointer-events: none;
         }
 
-        /* 看板樣式 - 不擋臉且大字 */
+        /* 看板樣式 - RWD */
         .mole-sign {
             position: absolute;
             bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 98%; 
-            height: 38%; /* 改用百分比高度，適應縮放 */
+            width: 94%; /* 稍微留邊，避免數字切到洞口邊緣 */
+            height: 38%; /* 相對高度 */
             background: #FFECB3;
             border: 4px solid #3E2723;
             border-radius: 12px;
@@ -183,7 +194,7 @@
             justify-content: center;
             align-items: center;
             
-            /* 預設字體大小 */
+            /* 預設字體 (JS 會動態修改) */
             font-size: 2.2rem; 
             font-weight: 900;
             font-family: 'Arial Black', sans-serif;
@@ -205,7 +216,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 15vmin; /* 關鍵：隨螢幕最小邊縮放 */
+            width: 15vmin; /* 隨螢幕縮放 */
             height: 15vmin;
             pointer-events: none;
             z-index: 9999;
@@ -225,7 +236,7 @@
         .float-text {
             position: absolute;
             font-weight: 900;
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #ff0000;
             pointer-events: none;
             animation: floatUp 0.8s forwards;
@@ -301,38 +312,20 @@
             transform: translateY(4px);
         }
 
-        /* RWD: 針對小螢幕與手機優化 */
+        /* RWD: 手機版字體微調 */
         @media (max-width: 600px) {
-            #grid {
-                gap: 10px;
-                width: 96%;
-            }
             #target-board {
-                font-size: 2.8rem;
+                font-size: 10vw; /* 目標數字在手機上更大 */
                 padding: 5px 20px;
                 margin: 1vh 0;
             }
             .hud-row {
                 font-size: 1rem;
             }
+            /* 預設小螢幕字體 */
             .mole-sign {
-                font-size: 1.8rem; /* 手機版預設字體稍小 */
+                font-size: 1.5rem; 
                 border-width: 3px;
-            }
-            .float-text {
-                font-size: 2rem;
-            }
-        }
-
-        /* RWD: 針對高度較矮的螢幕 (橫向手機) */
-        @media (max-height: 700px) {
-            #grid {
-                width: 80vh; /* 限制寬度以免太扁 */
-                max-width: 500px;
-            }
-            #target-board {
-                font-size: 2.2rem;
-                margin: 5px 0;
             }
         }
 
@@ -642,9 +635,10 @@
             moleObj.isCorrect = isCorrect;
             moleObj.sign.innerText = text;
             
-            // 字體自適應：如果算式太長，縮小字體
+            // 關鍵修改：動態字體縮放邏輯
+            // 如果是長算式 (例如 "12 x 12" 長度大於 5)，縮小字體
             if (text.length > 5) {
-                moleObj.sign.style.fontSize = '1.6rem';
+                moleObj.sign.style.fontSize = '1.6rem'; 
             } else {
                 moleObj.sign.style.fontSize = '2.2rem';
             }
@@ -727,7 +721,6 @@
                     }, 200);
                 }, 500); 
             }
-            // 確保 Combo 顯示即時更新
             updateHUD();
         }
 
