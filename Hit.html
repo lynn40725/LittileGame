@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>數學打地鼠 - V12</title>
+    <title>數學打地鼠v13</title>
     <style>
         :root {
             --primary-color: #FFB347;
@@ -20,7 +20,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center; /* 垂直置中 */
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
             user-select: none;
             cursor: none; /* 隱藏游標 */
@@ -33,9 +35,11 @@
             width: 100%;
             max-width: 600px;
             height: 100%;
+            max-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-start; /* 從上往下排 */
         }
 
         /* HUD */
@@ -50,6 +54,7 @@
             flex-direction: column;
             gap: 5px;
             z-index: 10;
+            flex-shrink: 0; /* 防止被擠壓 */
         }
 
         .hud-row {
@@ -83,7 +88,7 @@
             border: 5px solid #FF8C00;
             border-radius: 20px;
             padding: 5px 30px;
-            margin: 10px 0;
+            margin: 2vh 0; /* 使用 vh 讓間距自適應 */
             text-align: center;
             font-size: 3.5rem;
             font-weight: 900;
@@ -93,6 +98,7 @@
             animation: bounceIn 0.5s;
             text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
             z-index: 5;
+            flex-shrink: 0;
         }
         
         #target-label {
@@ -104,29 +110,32 @@
             font-weight: normal;
         }
 
-        /* 網格 */
+        /* 網格 - RWD 核心 */
         #grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px; 
-            width: 95%;
+            width: 90%;
             max-width: 500px;
+            /* 讓網格盡量佔滿剩餘空間，但不超過寬度 */
+            aspect-ratio: 1 / 1; 
             margin: auto;
-            padding-bottom: 60px;
+            padding-bottom: 20px;
         }
 
         .hole {
             background: var(--mole-bg);
             border-radius: 50%;
-            aspect-ratio: 1;
+            width: 100%;
+            height: 100%; /* 確保是正圓 */
             position: relative;
             overflow: hidden; 
             box-shadow: inset 0 10px 15px rgba(0,0,0,0.8);
-            border: 5px solid #281916;
+            border: 4px solid #281916;
             z-index: 1;
         }
 
-        /* 地鼠容器 - 修正回可愛棕色版 SVG */
+        /* 地鼠容器 */
         .mole {
             width: 100%;
             height: 100%;
@@ -137,8 +146,7 @@
             z-index: 2;
             background-repeat: no-repeat;
             background-position: center bottom;
-            background-size: 90%; /* 調整大小以配合看板 */
-            /* 可愛棕色地鼠 SVG (帶手掌) */
+            background-size: 90%; 
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Cpath d='M40,240 L160,240 L160,120 C160,60 120,30 100,30 C80,30 40,60 40,120 Z' fill='%238D6E63' stroke='%235D4037' stroke-width='4'/%3E%3Cellipse cx='100' cy='150' rx='40' ry='50' fill='%23D7CCC8' opacity='0.6'/%3E%3Ccircle cx='45' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='155' cy='50' r='15' fill='%238D6E63' stroke='%235D4037' stroke-width='3'/%3E%3Cellipse cx='70' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='75' cy='75' r='5' fill='white'/%3E%3Cellipse cx='130' cy='80' rx='12' ry='18' fill='black'/%3E%3Ccircle cx='135' cy='75' r='5' fill='white'/%3E%3Cellipse cx='100' cy='105' rx='18' ry='12' fill='%23FFAB91'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%233E2723'/%3E%3Cpath d='M100,105 L100,112 M90,112 Q100,120 110,112' stroke='%233E2723' stroke-width='2' fill='none'/%3E%3Ccircle cx='30' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3Ccircle cx='170' cy='160' r='15' fill='%23D7CCC8' stroke='%235D4037' stroke-width='3'/%3E%3C/svg%3E");
             cursor: none;
             display: flex;
@@ -149,7 +157,6 @@
             bottom: -5px;
         }
 
-        /* 被打到的可愛地鼠 SVG (暈眩版) */
         .mole.hit {
             bottom: -15px;
             transition: bottom 0.1s ease-in;
@@ -157,30 +164,37 @@
             pointer-events: none;
         }
 
-        /* 看板樣式 - 修正回不擋臉的位置 */
+        /* 看板樣式 */
         .mole-sign {
             position: absolute;
-            bottom: 12%; /* 關鍵：設在底部，讓地鼠頭部露出 */
+            bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 98%; 
-            height: 75px;
+            width: 96%; /* 稍微縮減寬度避免貼邊 */
+            height: 35%; /* 改用百分比高度 */
             background: #FFECB3;
-            border: 4px solid #3E2723;
-            border-radius: 12px;
+            border: 3px solid #3E2723;
+            border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             
             display: flex;
             justify-content: center;
             align-items: center;
             
-            font-size: 2.4rem; 
+            /* 預設字體大小，JS會動態調整 */
+            font-size: 2.2rem; 
             font-weight: 900;
             font-family: 'Arial Black', sans-serif;
             color: #000;
             white-space: nowrap;
             pointer-events: none;
             z-index: 3;
+            box-sizing: border-box; /* 確保padding不撐大 */
+        }
+
+        /* 縮小字體樣式 (由JS觸發) */
+        .mole-sign.small-text {
+            font-size: 1.5rem !important; /* 強制縮小 */
         }
         
         .mole.hit .mole-sign {
@@ -194,8 +208,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100px;
-            height: 100px;
+            width: 15vmin; /* 使用 vmin 讓鎚子隨螢幕大小縮放 */
+            height: 15vmin;
             pointer-events: none;
             z-index: 9999;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='30' y='20' width='40' height='50' rx='5' fill='%238D6E63' stroke='%233E2723' stroke-width='3'/%3E%3Crect x='45' y='65' width='10' height='30' fill='%23D7CCC8' stroke='%233E2723' stroke-width='2'/%3E%3Ccircle cx='35' cy='30' r='3' fill='%235D4037'/%3E%3Ccircle cx='65' cy='30' r='3' fill='%235D4037'/%3E%3C/svg%3E");
@@ -214,7 +228,7 @@
         .float-text {
             position: absolute;
             font-weight: 900;
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #ff0000;
             pointer-events: none;
             animation: floatUp 0.8s forwards;
@@ -288,6 +302,29 @@
         button:active {
             box-shadow: 0 2px 0 #2E7D32;
             transform: translateY(4px);
+        }
+
+        /* RWD 針對手機小螢幕優化 */
+        @media (max-width: 600px) {
+            #grid {
+                gap: 10px; /* 縮小間距 */
+                width: 95%;
+            }
+            #target-board {
+                font-size: 2.5rem; /* 縮小目標數字 */
+                padding: 5px 20px;
+                margin: 1vh 0;
+            }
+            .hud-row {
+                font-size: 1rem;
+            }
+            .mole-sign {
+                font-size: 1.8rem; /* 手機版預設字體縮小 */
+                border-width: 2px;
+            }
+            .mole-sign.small-text {
+                font-size: 1.2rem !important; /* 手機版長算式更小 */
+            }
         }
 
     </style>
@@ -367,6 +404,7 @@
             document.addEventListener('mousedown', swingHammer);
             document.addEventListener('mouseup', resetHammer);
 
+            // 觸控事件
             document.addEventListener('touchstart', (e) => {
                 if(e.touches.length > 0) {
                     updateHammerPos(e.touches[0].clientX, e.touches[0].clientY);
@@ -529,7 +567,7 @@
                     let f1 = Math.floor(Math.sqrt(fakeTarget));
                     if (f1 < 2) f1 = 2;
                     let f2 = Math.floor(fakeTarget / f1);
-                    if (f1 * f2 === target) f2++;
+                    if (f1 * f2 === target) f2 += 1;
                     equation = Math.random() > 0.5 ? `${f1} x ${f2}` : `${f2} x ${f1}`;
                 }
                 retryCount++;
@@ -595,6 +633,15 @@
             moleObj.isUp = true;
             moleObj.isCorrect = isCorrect;
             moleObj.sign.innerText = text;
+            
+            // 修正：動態判斷算式長度來調整字體大小
+            // 例如 "10 x 10" (7字元) 或是 "100 x 5" (7字元)
+            if (text.length > 5) {
+                moleObj.sign.classList.add('small-text');
+            } else {
+                moleObj.sign.classList.remove('small-text');
+            }
+
             moleObj.element.classList.remove('hit');
             moleObj.element.classList.add('up');
 
@@ -673,7 +720,6 @@
                     }, 200);
                 }, 500); 
             }
-            // 修正：無論是否換題，都要更新 HUD，確保 Combo 顯示正確
             updateHUD();
         }
 
