@@ -110,8 +110,8 @@ document.getElementById("timeLimit").oninput = e => {
 
 // 讀取資料
 Promise.all([
-  fetch("games.json").then(r => r.json()),
-  fetch("players.json").then(r => r.json())
+  fetch("./games.json").then(r => r.json()),
+  fetch("./players.json").then(r => r.json())
 ]).then(data => {
   games = data[0];
   players = data[1];
