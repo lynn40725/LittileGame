@@ -2,265 +2,761 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>智慧遊戲選購導覽系統</title>
 <style>
-  body {
-    margin: 0;
+  :root{
+    --bg:#f6f7fb;
+    --panel:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+
+    --primary:#2563eb;     /* 藍 */
+    --primary2:#1d4ed8;
+    --success:#16a34a;     /* 綠 */
+    --warn:#f59e0b;        /* 黃 */
+    --danger:#ef4444;      /* 紅 */
+
+    --chip:#eef2ff;
+    --shadow:0 10px 30px rgba(17,24,39,.08);
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-    background: #0f1220;
-    color: #eee;
+    background:var(--bg);
+    color:var(--text);
   }
-  h2 { margin-top: 0; }
-  .container {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    height: 100vh;
+
+  .layout{
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    min-height:100vh;
   }
-  .steps {
-    background: #161a33;
-    padding: 16px;
-    overflow-y: auto;
+
+  /* 左側步驟 */
+  .sidebar{
+    border-right:1px solid var(--line);
+    background:#ffffff;
+    padding:18px 14px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow:auto;
   }
-  .steps button {
-    width: 100%;
-    margin-bottom: 8px;
-    padding: 10px;
-    background: #242a5a;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 6px;
-    text-align: left;
+  .brand{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px 10px 14px 10px;
   }
-  .steps button:hover {
-    background: #3942a6;
+  .logo{
+    width:34px;height:34px;border-radius:10px;
+    background:linear-gradient(135deg, #2563eb, #22c55e);
   }
-  .main {
-    padding: 20px;
-    overflow-y: auto;
+  .brand h1{
+    font-size:16px;margin:0;
   }
-  .panel {
-    background: #1b2045;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
+  .brand p{ margin:2px 0 0 0; font-size:12px; color:var(--muted); }
+
+  .stepList{ display:flex; flex-direction:column; gap:10px; padding:8px; }
+  .stepBtn{
+    width:100%;
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:12px;
+    padding:12px 12px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:.15s;
+    text-align:left;
   }
-  pre {
-    background: #0b0e24;
-    padding: 12px;
-    border-radius: 6px;
-    overflow-x: auto;
-    font-size: 13px;
+  .stepBtn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(17,24,39,.08); }
+  .stepBtn[disabled]{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+  .stepTitle{
+    display:flex; flex-direction:column; gap:3px;
   }
-  input[type=range] {
-    width: 100%;
+  .stepTitle b{ font-size:13px; }
+  .stepTitle span{ font-size:12px; color:var(--muted); }
+  .badge{
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fafafa;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .badge.active{ background:var(--chip); color:var(--primary2); border-color:#c7d2fe; }
+  .badge.done{ background:#ecfdf5; color:var(--success); border-color:#bbf7d0; }
+
+  /* 右側 */
+  .main{
+    padding:18px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap:16px;
+    align-items:start;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+  }
+  .card h2{
+    margin:0 0 10px 0;
+    font-size:16px;
+  }
+  .muted{ color:var(--muted); font-size:13px; line-height:1.6; }
+
+  .row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+  label{ font-size:13px; color:var(--muted); display:block; margin-bottom:6px; }
+  input[type=range]{ width:100%; }
+  .valuePill{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#f3f4f6;
+    border:1px solid var(--line);
+    font-size:12px;
+    color:var(--text);
+  }
+
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:12px;
+  }
+  .btn{
+    border:none;
+    border-radius:12px;
+    padding:10px 12px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn.primary{ background:var(--primary); color:white; }
+  .btn.primary:hover{ background:var(--primary2); }
+  .btn.ghost{ background:#f3f4f6; color:var(--text); border:1px solid var(--line); }
+  .btn.ghost:hover{ background:#eaeef5; }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+
+  pre{
+    background:#0b1020;
+    color:#e5e7eb;
+    padding:14px;
+    border-radius:12px;
+    overflow:auto;
+    font-size:12.5px;
+    line-height:1.5;
+    border:1px solid rgba(255,255,255,.08);
+  }
+
+  .statusLine{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+  .dot{
+    width:10px;height:10px;border-radius:999px;
+    background:var(--warn);
+  }
+  .dot.ready{ background:var(--warn); }
+  .dot.done{ background:var(--success); }
+  .dot.err{ background:var(--danger); }
+
+  .algoBox ul{ margin:8px 0 0 18px; color:var(--muted); font-size:13px; line-height:1.7; }
+  .kpi{
+    display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
+  }
+  .chip{
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:var(--chip);
+    border:1px solid #c7d2fe;
+    color:var(--primary2);
   }
 </style>
 </head>
 
 <body>
-<div class="container">
+<div class="layout">
 
   <!-- 左側流程 -->
-  <div class="steps">
-    <h2>流程步驟</h2>
-    <button onclick="step1_knn()">Step 1｜玩家個性（KNN）</button>
-    <button onclick="step2_candidates()">Step 2｜挖候選遊戲（Hash）</button>
-    <button onclick="step3_timeFilter()">Step 3｜時間門檻（二元搜尋）</button>
-    <button onclick="step4_unionFind()">Step 4｜版本去重（Union-Find）</button>
-    <button onclick="step5_greedyDP()">Step 5｜個性最佳化（Greedy + DP）</button>
-    <button onclick="step6_maxFlow()">Step 6｜類型平衡（Max Flow）</button>
-  </div>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>智慧遊戲選購 導覽系統</h1>
+        <p>Step-by-step 演算法流程展示</p>
+      </div>
+    </div>
+
+    <div class="stepList">
+      <button class="stepBtn" id="btnStep1" onclick="goStep(1)">
+        <div class="stepTitle">
+          <b>Step 1｜KNN：找相似玩家</b>
+          <span>從偏好向量找最近鄰</span>
+        </div>
+        <span class="badge active" id="badge1">進行中</span>
+      </button>
+
+      <button class="stepBtn" id="btnStep2" onclick="goStep(2)" disabled>
+        <div class="stepTitle">
+          <b>Step 2｜Hash：挖候選遊戲</b>
+          <span>從相似玩家庫挖候選</span>
+        </div>
+        <span class="badge" id="badge2">鎖定</span>
+      </button>
+
+      <button class="stepBtn" id="btnStep3" onclick="goStep(3)" disabled>
+        <div class="stepTitle">
+          <b>Step 3｜Binary Search：時間篩選</b>
+          <span>玩得完才推薦</span>
+        </div>
+        <span class="badge" id="badge3">鎖定</span>
+      </button>
+
+      <button class="stepBtn" id="btnStep4" onclick="goStep(4)" disabled>
+        <div class="stepTitle">
+          <b>Step 4｜Union-Find：版本去重</b>
+          <span>同款不同版合併</span>
+        </div>
+        <span class="badge" id="badge4">鎖定</span>
+      </button>
+
+      <button class="stepBtn" id="btnStep5" onclick="goStep(5)" disabled>
+        <div class="stepTitle">
+          <b>Step 5｜Greedy + DP：最佳組合</b>
+          <span>時間背包最佳化</span>
+        </div>
+        <span class="badge" id="badge5">鎖定</span>
+      </button>
+
+      <button class="stepBtn" id="btnStep6" onclick="goStep(6)" disabled>
+        <div class="stepTitle">
+          <b>Step 6｜Max Flow：類型平衡</b>
+          <span>避免清單偏科</span>
+        </div>
+        <span class="badge" id="badge6">鎖定</span>
+      </button>
+    </div>
+  </aside>
 
   <!-- 右側主畫面 -->
-  <div class="main">
-    <div class="panel">
-      <h2>使用者偏好（問卷）</h2>
-      Action <input type="range" id="p_action" min="0" max="10" value="6"><br>
-      Narrative <input type="range" id="p_narrative" min="0" max="10" value="7"><br>
-      Puzzle <input type="range" id="p_puzzle" min="0" max="10" value="5"><br>
-      Text <input type="range" id="p_text" min="0" max="10" value="4"><br>
-      <br>
-      可用遊玩時間（小時）
-      <input type="range" id="timeLimit" min="5" max="40" value="20">
-      <span id="timeLabel">20</span> 小時
-    </div>
+  <main class="main">
+    <div class="grid">
 
-    <div class="panel">
-      <h2>目前結果</h2>
-      <pre id="output">請從 Step 1 開始</pre>
-    </div>
-  </div>
+      <!-- 互動與結果 -->
+      <section class="card">
+        <h2 id="stepTitle">Step 1｜KNN：找相似玩家</h2>
+        <p class="muted" id="stepSubtitle">
+          調整你的偏好，系統將找出最相似的玩家（最近鄰），用來作為推薦的資料來源。
+        </p>
 
+        <div class="row">
+          <div>
+            <label>Action <span class="valuePill" id="va">6</span></label>
+            <input type="range" id="p_action" min="0" max="10" value="6">
+          </div>
+          <div>
+            <label>Narrative <span class="valuePill" id="vn">7</span></label>
+            <input type="range" id="p_narrative" min="0" max="10" value="7">
+          </div>
+          <div>
+            <label>Puzzle <span class="valuePill" id="vp">5</span></label>
+            <input type="range" id="p_puzzle" min="0" max="10" value="5">
+          </div>
+          <div>
+            <label>Text <span class="valuePill" id="vt">4</span></label>
+            <input type="range" id="p_text" min="0" max="10" value="4">
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label>可用遊玩時間（小時） <span class="valuePill" id="timeLabel">20</span></label>
+          <input type="range" id="timeLimit" min="5" max="40" value="20">
+        </div>
+
+        <div class="controls">
+          <button class="btn primary" id="runBtn" onclick="runCurrentStep()">執行本步驟</button>
+          <button class="btn ghost" id="confirmBtn" onclick="confirmStep()" disabled>確定（鎖定結果）</button>
+          <button class="btn primary" id="nextBtn" onclick="nextStep()" disabled>下一步 →</button>
+          <button class="btn ghost" onclick="resetAll()">重設流程</button>
+        </div>
+
+        <div class="statusLine">
+          <div class="dot ready" id="statusDot"></div>
+          <div class="muted" id="statusText">請先「執行本步驟」，再按「確定」進入下一步。</div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <pre id="output">資料載入中…</pre>
+        </div>
+      </section>
+
+      <!-- 演算法說明欄 -->
+      <aside class="card algoBox">
+        <h2>正在使用的演算法</h2>
+        <div class="muted" id="algoName">KNN（K-Nearest Neighbors）</div>
+
+        <div class="kpi" id="algoChips">
+          <span class="chip">非參數式</span>
+          <span class="chip">以距離衡量相似</span>
+          <span class="chip">適合推薦/分類</span>
+        </div>
+
+        <ul id="algoBullets">
+          <li>把你當成一個「偏好向量」</li>
+          <li>計算你與每個玩家的距離（越小越像）</li>
+          <li>取前 K 名作為相似玩家，後續用他們的收藏庫挖候選遊戲</li>
+        </ul>
+
+        <div style="margin-top:12px;">
+          <div class="muted"><b>本步驟輸出</b></div>
+          <div class="muted" id="algoOutputHint">相似玩家清單（含距離）</div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
 </div>
 
 <script>
+/* =========================
+   資料載入
+========================= */
 let games = [];
 let players = [];
 
+// 流程狀態
+let currentStep = 1;
+const stepDone = {1:false,2:false,3:false,4:false,5:false,6:false};
+let stepHasRun = false; // 本步驟是否已「執行」但未確定
+
+// 資料流中間結果
 let neighbors = [];
 let candidateGameIds = [];
 let timeFiltered = [];
 let uniqueGames = [];
 let bestSet = [];
 
-document.getElementById("timeLimit").oninput = e => {
-  document.getElementById("timeLabel").innerText = e.target.value;
-};
+function $(id){ return document.getElementById(id); }
 
-// 讀取資料
+function setOutput(obj, title="結果"){
+  $("output").textContent = title + "\n" + JSON.stringify(obj, null, 2);
+}
+
+function setStatus(type, text){
+  const dot = $("statusDot");
+  dot.className = "dot " + (type === "done" ? "done" : type === "err" ? "err" : "ready");
+  $("statusText").textContent = text;
+}
+
+function syncSliderLabels(){
+  $("va").textContent = $("p_action").value;
+  $("vn").textContent = $("p_narrative").value;
+  $("vp").textContent = $("p_puzzle").value;
+  $("vt").textContent = $("p_text").value;
+  $("timeLabel").textContent = $("timeLimit").value;
+}
+["p_action","p_narrative","p_puzzle","p_text","timeLimit"].forEach(id=>{
+  $(id).addEventListener("input", syncSliderLabels);
+});
+syncSliderLabels();
+
+// ★ 重要：用 ./ 確保在 /algorithm/ 子資料夾部署也穩
 Promise.all([
-  fetch("./games.json").then(r => r.json()),
-  fetch("./players.json").then(r => r.json())
-]).then(data => {
-  games = data[0];
-  players = data[1];
+  fetch("./games.json").then(r => { if(!r.ok) throw new Error("games.json not found"); return r.json(); }),
+  fetch("./players.json").then(r => { if(!r.ok) throw new Error("players.json not found"); return r.json(); })
+]).then(([g,p])=>{
+  games = g; players = p;
+  $("output").textContent = `資料載入成功 ✅\n- games: ${games.length}\n- players: ${players.length}\n\n請從 Step 1 開始。`;
+}).catch(err=>{
+  $("output").textContent = "資料載入失敗 ❌\n" + err;
+  setStatus("err","資料載入失敗，請確認 games.json / players.json 是否與 index.html 同層。");
 });
 
-// Step 1: KNN
-function step1_knn() {
-  const user = [
-    +p_action.value,
-    +p_narrative.value,
-    +p_puzzle.value,
-    +p_text.value
-  ];
+/* =========================
+   演算法說明（每步）
+========================= */
+const algoInfo = {
+  1: {
+    title: "Step 1｜KNN：找相似玩家",
+    subtitle: "調整你的偏好，系統將找出最相似的玩家（最近鄰），用來作為推薦的資料來源。",
+    name: "KNN（K-Nearest Neighbors）",
+    chips: ["非參數式", "以距離衡量相似", "適合推薦/分類"],
+    bullets: [
+      "把你當成一個「偏好向量」",
+      "計算你與每個玩家的距離（越小越像）",
+      "取前 K 名作為相似玩家，後續用他們的收藏庫挖候選遊戲"
+    ],
+    outHint: "相似玩家清單（含距離）"
+  },
+  2: {
+    title: "Step 2｜Hash：挖候選遊戲",
+    subtitle: "把相似玩家的收藏庫合併成候選池，概念上像用索引快速定位資料。",
+    name: "Hash Table（雜湊表）",
+    chips: ["平均 O(1) 查找", "適合索引", "快速去重/合併"],
+    bullets: [
+      "把相似玩家的 library 合併成候選集合（Set）",
+      "雜湊結構可以快速判斷『這個遊戲 ID 出現過沒』",
+      "輸出候選遊戲池，供後續依時間上限篩掉玩不完的遊戲"
+    ],
+    outHint: "候選遊戲 ID 清單（Candidate Pool）"
+  },
+  3: {
+    title: "Step 3｜Binary Search：時間篩選",
+    subtitle: "以『可用遊玩時間』當硬限制，排序後用二元搜尋找到 <= timeLimit 的範圍。",
+    name: "Binary Search（二元搜尋）",
+    chips: ["O(log n)", "需排序", "找範圍/門檻很快"],
+    bullets: [
+      "先把候選遊戲依 playtime_hours 排序",
+      "用二元搜尋找出「最後一個 <= 時間上限」的位置",
+      "切出玩得完的清單（時間可行）"
+    ],
+    outHint: "時間可行遊戲清單（playtime ≤ limit）"
+  },
+  4: {
+    title: "Step 4｜Union-Find：版本去重",
+    subtitle: "同一款遊戲可能有不同版本/平台，用 groupId 合併，避免推薦重複。",
+    name: "Union-Find（Disjoint Set Union）",
+    chips: ["快速合併/查詢集合", "避免重複", "資料清洗很常用"],
+    bullets: [
+      "把同 groupId 的遊戲視為同一款",
+      "推薦時每個 groupId 只保留一次",
+      "輸出去重後清單，讓後續最佳化不被重複項干擾"
+    ],
+    outHint: "去重後遊戲清單（每個 groupId 只出現一次）"
+  },
+  5: {
+    title: "Step 5｜Greedy + DP：最佳組合",
+    subtitle: "先用貪婪做『快速可用』清單，再用 DP 在時間限制下找『總符合度最高』的組合。",
+    name: "Greedy + Dynamic Programming（時間背包）",
+    chips: ["先快後準", "背包問題", "全局最佳"],
+    bullets: [
+      "Greedy：用分數排序，先挑 Top-N 當候選",
+      "DP：以時間為容量、分數為價值，找總分最高的可玩組合",
+      "輸出最終最佳遊玩清單（真的玩得完）"
+    ],
+    outHint: "最佳遊玩組合（總分最高且不超時）"
+  },
+  6: {
+    title: "Step 6｜Max Flow：類型平衡",
+    subtitle: "最後一步做『多樣性』：避免推薦清單全部偏同一類型（例如全敘事）。",
+    name: "Max Flow（最大流）",
+    chips: ["資源分配", "配額限制", "平衡多樣性"],
+    bullets: [
+      "把『類型』視為有配額的資源（每類最多幾款）",
+      "把遊戲視為需求節點，每款最多選一次",
+      "用最大流概念做最後平衡（本版用簡化版展示）"
+    ],
+    outHint: "類型分布/配額平衡後的結果"
+  }
+};
 
-  function dist(a, b) {
-    return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i])**2, 0));
+function renderAlgo(step){
+  const info = algoInfo[step];
+  $("stepTitle").textContent = info.title;
+  $("stepSubtitle").textContent = info.subtitle;
+  $("algoName").textContent = info.name;
+
+  $("algoChips").innerHTML = info.chips.map(c=>`<span class="chip">${c}</span>`).join("");
+  $("algoBullets").innerHTML = info.bullets.map(b=>`<li>${b}</li>`).join("");
+  $("algoOutputHint").textContent = info.outHint;
+}
+
+/* =========================
+   流程控制 UI（一步一步）
+========================= */
+function updateStepUI(){
+  // 更新左側 badge
+  for(let i=1;i<=6;i++){
+    const badge = $("badge"+i);
+    badge.classList.remove("active","done");
+    if(stepDone[i]){
+      badge.textContent = "完成";
+      badge.classList.add("done");
+    }else if(i === currentStep){
+      badge.textContent = "進行中";
+      badge.classList.add("active");
+    }else{
+      badge.textContent = "鎖定";
+    }
+  }
+
+  // 鎖定步驟按鈕（只能進行到目前 step）
+  for(let i=1;i<=6;i++){
+    const btn = $("btnStep"+i);
+    btn.disabled = (i !== currentStep); // 強制一步一步，不讓跳步
+  }
+
+  // 控制按鈕狀態
+  $("confirmBtn").disabled = !stepHasRun;     // 執行後才能確定
+  $("nextBtn").disabled = !stepDone[currentStep]; // 確定完成後才能下一步
+
+  renderAlgo(currentStep);
+}
+updateStepUI();
+
+function goStep(step){
+  // 本版：強制只能點目前 step（不允許跳）
+  currentStep = step;
+  stepHasRun = false;
+  setStatus("ready","請先「執行本步驟」，再按「確定」進入下一步。");
+  updateStepUI();
+}
+
+/* =========================
+   每步演算法實作（可再細修）
+========================= */
+function getUserVector(){
+  return [
+    +$("p_action").value,
+    +$("p_narrative").value,
+    +$("p_puzzle").value,
+    +$("p_text").value
+  ];
+}
+
+// Step 1: KNN
+function step1_knn(){
+  const user = getUserVector();
+  const K = 5;
+
+  function dist(a, b){
+    return Math.sqrt(a.reduce((s,v,i)=> s + (v - b[i])**2, 0));
   }
 
   neighbors = players
-    .map(p => ({
-      id: p.id,
-      d: dist(user, Object.values(p.pref_0_10))
-    }))
-    .sort((a,b) => a.d - b.d)
-    .slice(0, 5);
+    .map(p => {
+      const pv = Object.values(p.pref_0_10); // action,narrative,puzzle,text
+      return { id:p.id, d:+dist(user, pv).toFixed(4) };
+    })
+    .sort((a,b)=> a.d - b.d)
+    .slice(0, K);
 
-  output.innerText =
-    "最相似的玩家（KNN）:\n" +
-    JSON.stringify(neighbors, null, 2);
+  return { K, user_pref:user, neighbors };
 }
 
-// Step 2: Hash Table 挖候選
-function step2_candidates() {
-  const lib = new Set();
-  neighbors.forEach(n => {
-    const p = players.find(x => x.id === n.id);
-    p.library.forEach(g => lib.add(g));
+// Step 2: Hash (Set)
+function step2_candidates(){
+  const set = new Set();
+  neighbors.forEach(n=>{
+    const p = players.find(x=>x.id===n.id);
+    if(!p) return;
+    p.library.forEach(id=> set.add(id));
   });
-  candidateGameIds = [...lib];
-
-  output.innerText =
-    `候選遊戲數量：${candidateGameIds.length}\n` +
-    JSON.stringify(candidateGameIds.slice(0,10), null, 2) +
-    "\n...";
+  candidateGameIds = [...set];
+  return { candidate_count: candidateGameIds.length, sample: candidateGameIds.slice(0,12) };
 }
 
-// Step 3: Binary Search（時間）
-function step3_timeFilter() {
-  const limit = +timeLimit.value;
+// Step 3: Binary Search (time limit)
+function step3_timeFilter(){
+  const limit = +$("timeLimit").value;
   const arr = candidateGameIds
-    .map(id => games.find(g => g.id === id))
-    .sort((a,b) => a.playtime_hours - b.playtime_hours);
+    .map(id => games.find(g=>g.id===id))
+    .filter(Boolean)
+    .sort((a,b)=> a.playtime_hours - b.playtime_hours);
 
-  let l = 0, r = arr.length;
-  while (l < r) {
-    let m = Math.floor((l + r) / 2);
-    if (arr[m].playtime_hours <= limit) l = m + 1;
+  // upper_bound: last index where playtime <= limit
+  let l=0, r=arr.length;
+  while(l<r){
+    const m = (l+r)>>1;
+    if(arr[m].playtime_hours <= limit) l = m+1;
     else r = m;
   }
-  timeFiltered = arr.slice(0, l);
+  timeFiltered = arr.slice(0,l);
 
-  output.innerText =
-    `時間可行遊戲（<= ${limit} 小時）：${timeFiltered.length} 款\n` +
-    JSON.stringify(timeFiltered.map(g => ({
-      id: g.id,
-      time: g.playtime_hours
-    })), null, 2);
+  return {
+    time_limit_hours: limit,
+    feasible_count: timeFiltered.length,
+    feasible: timeFiltered.map(g=>({id:g.id, name:g.name, playtime_hours:g.playtime_hours}))
+  };
 }
 
-// Step 4: Union-Find
-function step4_unionFind() {
+// Step 4: Union-Find（此處用 groupId 去重；若要更「像」Union-Find 可再補 DSU 結構）
+function step4_unionFind(){
   const seen = new Set();
   uniqueGames = [];
-
-  timeFiltered.forEach(g => {
-    if (!seen.has(g.groupId)) {
+  timeFiltered.forEach(g=>{
+    if(!seen.has(g.groupId)){
       seen.add(g.groupId);
       uniqueGames.push(g);
     }
   });
-
-  output.innerText =
-    `去重後遊戲數量：${uniqueGames.length}\n` +
-    JSON.stringify(uniqueGames.map(g => ({
-      id: g.id,
-      group: g.groupId
-    })), null, 2);
+  return {
+    unique_count: uniqueGames.length,
+    unique: uniqueGames.map(g=>({id:g.id, name:g.name, groupId:g.groupId, playtime_hours:g.playtime_hours}))
+  };
 }
 
 // Step 5: Greedy + DP（時間背包）
-function step5_greedyDP() {
-  const userPref = [
-    +p_action.value,
-    +p_narrative.value,
-    +p_puzzle.value,
-    +p_text.value
-  ];
+function step5_greedyDP(){
+  const T = +$("timeLimit").value;
 
-  uniqueGames.forEach(g => {
-    g.score =
-      g.rating_100 / 20 +
-      g.discount_pct / 20 -
-      g.playtime_hours / 10;
+  // 分數：示範（你可以再微調權重）
+  uniqueGames.forEach(g=>{
+    g._score =
+      (g.rating_100/20) +       // 0~5
+      (g.discount_pct/25) -     // 0~3.6
+      (g.playtime_hours/12);    // 0~3.3
   });
 
-  const sorted = [...uniqueGames].sort((a,b) => b.score - a.score).slice(0, 10);
+  // Greedy：先取 Top-N
+  const N = Math.min(12, uniqueGames.length);
+  const top = [...uniqueGames].sort((a,b)=> b._score - a._score).slice(0,N);
 
-  const T = +timeLimit.value;
+  // DP：0/1 背包（容量=時間）
   const dp = Array(T+1).fill(0);
-  const pick = Array(T+1).fill(null);
+  const choice = Array(T+1).fill(null);
+  const prevT = Array(T+1).fill(null);
 
-  sorted.forEach(g => {
-    for (let t = T; t >= g.playtime_hours; t--) {
-      const v = dp[t - g.playtime_hours] + g.score;
-      if (v > dp[t]) {
-        dp[t] = v;
-        pick[t] = g;
+  for(const g of top){
+    const w = g.playtime_hours;
+    const v = g._score;
+    for(let t=T; t>=w; t--){
+      const cand = dp[t-w] + v;
+      if(cand > dp[t]){
+        dp[t] = cand;
+        choice[t] = g;
+        prevT[t] = t-w;
       }
     }
-  });
-
-  let t = T;
-  bestSet = [];
-  while (t > 0 && pick[t]) {
-    bestSet.push(pick[t]);
-    t -= pick[t].playtime_hours;
   }
 
-  output.innerText =
-    "Greedy + DP 最佳組合：\n" +
-    JSON.stringify(bestSet.map(g => ({
-      id: g.id,
-      time: g.playtime_hours,
-      score: g.score.toFixed(2)
-    })), null, 2);
+  // 回溯
+  let t = T;
+  bestSet = [];
+  while(t !== null && choice[t]){
+    bestSet.push(choice[t]);
+    t = prevT[t];
+  }
+
+  // 統計
+  const totalTime = bestSet.reduce((s,g)=>s+g.playtime_hours,0);
+  const totalScore = bestSet.reduce((s,g)=>s+g._score,0);
+
+  return {
+    greedy_topN: top.map(g=>({id:g.id, score:+g._score.toFixed(3), playtime_hours:g.playtime_hours})),
+    dp_bestSet: bestSet.map(g=>({id:g.id, name:g.name, playtime_hours:g.playtime_hours, score:+g._score.toFixed(3)})),
+    total_time_hours: totalTime,
+    total_score: +totalScore.toFixed(3),
+    time_capacity: T
+  };
 }
 
-// Step 6: Max Flow（簡化展示）
-function step6_maxFlow() {
-  const typeCount = {};
-  bestSet.forEach(g => {
-    g.tags.forEach(t => {
-      typeCount[t] = (typeCount[t] || 0) + 1;
-    });
-  });
+// Step 6: Max Flow（本版先用「配額平衡」的簡化展示；你若要我也能幫你補真正 max flow 實作）
+function step6_maxFlow(){
+  // 簡化：每類最多 2 款（示意）
+  const quota = { action:2, narrative:2, puzzle:2, text:2 };
+  const picked = [];
+  const used = { action:0, narrative:0, puzzle:0, text:0 };
 
-  output.innerText =
-    "類型分布（模擬最大流平衡結果）：\n" +
-    JSON.stringify(typeCount, null, 2);
+  // 用 score 高到低嘗試加入，若超配額就略過（這是簡化版「平衡策略」）
+  const pool = [...bestSet].sort((a,b)=> (b._score||0) - (a._score||0));
+  for(const g of pool){
+    // 計算加入後是否會超任何類型配額
+    let ok = true;
+    for(const tag of g.tags){
+      if(quota[tag] !== undefined && used[tag] + 1 > quota[tag]){
+        ok = false;
+        break;
+      }
+    }
+    if(ok){
+      picked.push(g);
+      for(const tag of g.tags){
+        if(used[tag] !== undefined) used[tag] += 1;
+      }
+    }
+  }
+
+  return {
+    quota,
+    tag_usage: used,
+    balanced_result: picked.map(g=>({id:g.id, name:g.name, tags:g.tags, playtime_hours:g.playtime_hours}))
+  };
+}
+
+/* =========================
+   互動：執行 → 確定 → 下一步
+========================= */
+function runCurrentStep(){
+  try{
+    if(!games.length || !players.length){
+      setStatus("err","資料尚未載入完成，請稍候再試。");
+      return;
+    }
+
+    let result;
+    if(currentStep === 1) result = step1_knn();
+    if(currentStep === 2) result = step2_candidates();
+    if(currentStep === 3) result = step3_timeFilter();
+    if(currentStep === 4) result = step4_unionFind();
+    if(currentStep === 5) result = step5_greedyDP();
+    if(currentStep === 6) result = step6_maxFlow();
+
+    setOutput(result, "本步驟輸出");
+    stepHasRun = true;
+    setStatus("ready","已執行 ✅ 請按「確定」鎖定結果，才能進入下一步。");
+    updateStepUI();
+  }catch(e){
+    setStatus("err","執行失敗：" + e.message);
+  }
+}
+
+function confirmStep(){
+  // 鎖定本步驟結果：標記完成，解鎖下一步
+  stepDone[currentStep] = true;
+  stepHasRun = false;
+  setStatus("done","已確定 ✅ 你可以按「下一步」繼續。");
+  updateStepUI();
+}
+
+function nextStep(){
+  if(!stepDone[currentStep]) return;
+  if(currentStep >= 6) {
+    setStatus("done","流程已完成 ✅ 你可以重設或調整參數重跑。");
+    return;
+  }
+  currentStep += 1;
+  stepHasRun = false;
+  setStatus("ready","進入下一步。請先「執行本步驟」，再按「確定」。");
+  updateStepUI();
+}
+
+function resetAll(){
+  currentStep = 1;
+  for(let i=1;i<=6;i++) stepDone[i] = false;
+  stepHasRun = false;
+
+  // 清空中間結果
+  neighbors = [];
+  candidateGameIds = [];
+  timeFiltered = [];
+  uniqueGames = [];
+  bestSet = [];
+
+  $("output").textContent = "已重設流程 ✅\n請從 Step 1 開始。";
+  setStatus("ready","請先「執行本步驟」，再按「確定」進入下一步。");
+  updateStepUI();
 }
 </script>
 </body>
