@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<title>智慧遊戲選購導覽系統</title>
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+    background: #0f1220;
+    color: #eee;
+  }
+  h2 { margin-top: 0; }
+  .container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    height: 100vh;
+  }
+  .steps {
+    background: #161a33;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .steps button {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    background: #242a5a;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: left;
+  }
+  .steps button:hover {
+    background: #3942a6;
+  }
+  .main {
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .panel {
+    background: #1b2045;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  pre {
+    background: #0b0e24;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 13px;
+  }
+  input[type=range] {
+    width: 100%;
+  }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- 左側流程 -->
+  <div class="steps">
+    <h2>流程步驟</h2>
+    <button onclick="step1_knn()">Step 1｜玩家個性（KNN）</button>
+    <button onclick="step2_candidates()">Step 2｜挖候選遊戲（Hash）</button>
+    <button onclick="step3_timeFilter()">Step 3｜時間門檻（二元搜尋）</button>
+    <button onclick="step4_unionFind()">Step 4｜版本去重（Union-Find）</button>
+    <button onclick="step5_greedyDP()">Step 5｜個性最佳化（Greedy + DP）</button>
+    <button onclick="step6_maxFlow()">Step 6｜類型平衡（Max Flow）</button>
+  </div>
+
+  <!-- 右側主畫面 -->
+  <div class="main">
+    <div class="panel">
+      <h2>使用者偏好（問卷）</h2>
+      Action <input type="range" id="p_action" min="0" max="10" value="6"><br>
+      Narrative <input type="range" id="p_narrative" min="0" max="10" value="7"><br>
+      Puzzle <input type="range" id="p_puzzle" min="0" max="10" value="5"><br>
+      Text <input type="range" id="p_text" min="0" max="10" value="4"><br>
+      <br>
+      可用遊玩時間（小時）
+      <input type="range" id="timeLimit" min="5" max="40" value="20">
+      <span id="timeLabel">20</span> 小時
+    </div>
+
+    <div class="panel">
+      <h2>目前結果</h2>
+      <pre id="output">請從 Step 1 開始</pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let games = [];
+let players = [];
+
+let neighbors = [];
+let candidateGameIds = [];
+let timeFiltered = [];
+let uniqueGames = [];
+let bestSet = [];
+
+document.getElementById("timeLimit").oninput = e => {
+  document.getElementById("timeLabel").innerText = e.target.value;
+};
+
+// 讀取資料
+Promise.all([
+  fetch("games.json").then(r => r.json()),
+  fetch("players.json").then(r => r.json())
+]).then(data => {
+  games = data[0];
+  players = data[1];
+});
+
+// Step 1: KNN
+function step1_knn() {
+  const user = [
+    +p_action.value,
+    +p_narrative.value,
+    +p_puzzle.value,
+    +p_text.value
+  ];
+
+  function dist(a, b) {
+    return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i])**2, 0));
+  }
+
+  neighbors = players
+    .map(p => ({
+      id: p.id,
+      d: dist(user, Object.values(p.pref_0_10))
+    }))
+    .sort((a,b) => a.d - b.d)
+    .slice(0, 5);
+
+  output.innerText =
+    "最相似的玩家（KNN）:\n" +
+    JSON.stringify(neighbors, null, 2);
+}
+
+// Step 2: Hash Table 挖候選
+function step2_candidates() {
+  const lib = new Set();
+  neighbors.forEach(n => {
+    const p = players.find(x => x.id === n.id);
+    p.library.forEach(g => lib.add(g));
+  });
+  candidateGameIds = [...lib];
+
+  output.innerText =
+    `候選遊戲數量：${candidateGameIds.length}\n` +
+    JSON.stringify(candidateGameIds.slice(0,10), null, 2) +
+    "\n...";
+}
+
+// Step 3: Binary Search（時間）
+function step3_timeFilter() {
+  const limit = +timeLimit.value;
+  const arr = candidateGameIds
+    .map(id => games.find(g => g.id === id))
+    .sort((a,b) => a.playtime_hours - b.playtime_hours);
+
+  let l = 0, r = arr.length;
+  while (l < r) {
+    let m = Math.floor((l + r) / 2);
+    if (arr[m].playtime_hours <= limit) l = m + 1;
+    else r = m;
+  }
+  timeFiltered = arr.slice(0, l);
+
+  output.innerText =
+    `時間可行遊戲（<= ${limit} 小時）：${timeFiltered.length} 款\n` +
+    JSON.stringify(timeFiltered.map(g => ({
+      id: g.id,
+      time: g.playtime_hours
+    })), null, 2);
+}
+
+// Step 4: Union-Find
+function step4_unionFind() {
+  const seen = new Set();
+  uniqueGames = [];
+
+  timeFiltered.forEach(g => {
+    if (!seen.has(g.groupId)) {
+      seen.add(g.groupId);
+      uniqueGames.push(g);
+    }
+  });
+
+  output.innerText =
+    `去重後遊戲數量：${uniqueGames.length}\n` +
+    JSON.stringify(uniqueGames.map(g => ({
+      id: g.id,
+      group: g.groupId
+    })), null, 2);
+}
+
+// Step 5: Greedy + DP（時間背包）
+function step5_greedyDP() {
+  const userPref = [
+    +p_action.value,
+    +p_narrative.value,
+    +p_puzzle.value,
+    +p_text.value
+  ];
+
+  uniqueGames.forEach(g => {
+    g.score =
+      g.rating_100 / 20 +
+      g.discount_pct / 20 -
+      g.playtime_hours / 10;
+  });
+
+  const sorted = [...uniqueGames].sort((a,b) => b.score - a.score).slice(0, 10);
+
+  const T = +timeLimit.value;
+  const dp = Array(T+1).fill(0);
+  const pick = Array(T+1).fill(null);
+
+  sorted.forEach(g => {
+    for (let t = T; t >= g.playtime_hours; t--) {
+      const v = dp[t - g.playtime_hours] + g.score;
+      if (v > dp[t]) {
+        dp[t] = v;
+        pick[t] = g;
+      }
+    }
+  });
+
+  let t = T;
+  bestSet = [];
+  while (t > 0 && pick[t]) {
+    bestSet.push(pick[t]);
+    t -= pick[t].playtime_hours;
+  }
+
+  output.innerText =
+    "Greedy + DP 最佳組合：\n" +
+    JSON.stringify(bestSet.map(g => ({
+      id: g.id,
+      time: g.playtime_hours,
+      score: g.score.toFixed(2)
+    })), null, 2);
+}
+
+// Step 6: Max Flow（簡化展示）
+function step6_maxFlow() {
+  const typeCount = {};
+  bestSet.forEach(g => {
+    g.tags.forEach(t => {
+      typeCount[t] = (typeCount[t] || 0) + 1;
+    });
+  });
+
+  output.innerText =
+    "類型分布（模擬最大流平衡結果）：\n" +
+    JSON.stringify(typeCount, null, 2);
+}
+</script>
+</body>
+</html>
