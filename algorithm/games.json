@@ -1,0 +1,660 @@
+[
+  {
+    "id": "G001",
+    "name": "Apex Hollow",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 25,
+    "rating_100": 79,
+    "discount_pct": 49,
+    "price_usd": 18.9,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP08"
+  },
+  {
+    "id": "G002",
+    "name": "Shock Letters",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 13,
+    "rating_100": 73,
+    "discount_pct": 63,
+    "price_usd": 8.21,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP10"
+  },
+  {
+    "id": "G003",
+    "name": "Glyph Script",
+    "tags": [
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 21,
+    "rating_100": 76,
+    "discount_pct": 61,
+    "price_usd": 11.13,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U01"
+  },
+  {
+    "id": "G004",
+    "name": "Blade Route Complete",
+    "tags": [
+      "action",
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 8,
+    "rating_100": 71,
+    "discount_pct": 1,
+    "price_usd": 15.02,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U02"
+  },
+  {
+    "id": "G005",
+    "name": "Memory Novel",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 21,
+    "rating_100": 68,
+    "discount_pct": 24,
+    "price_usd": 18.05,
+    "platforms": [
+      "NS"
+    ],
+    "groupId": "U03"
+  },
+  {
+    "id": "G006",
+    "name": "Route Portal",
+    "tags": [
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 9,
+    "rating_100": 76,
+    "discount_pct": 34,
+    "price_usd": 14.67,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP01"
+  },
+  {
+    "id": "G007",
+    "name": "Nodes Route Complete",
+    "tags": [
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 13,
+    "rating_100": 91,
+    "discount_pct": 3,
+    "price_usd": 25.15,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP01"
+  },
+  {
+    "id": "G008",
+    "name": "Prism Pulse",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 7,
+    "rating_100": 85,
+    "discount_pct": 65,
+    "price_usd": 7.13,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U04"
+  },
+  {
+    "id": "G009",
+    "name": "Echo Tales",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 16,
+    "rating_100": 79,
+    "discount_pct": 14,
+    "price_usd": 17.59,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U05"
+  },
+  {
+    "id": "G010",
+    "name": "Turbo Hearts",
+    "tags": [
+      "action",
+      "text"
+    ],
+    "playtime_hours": 21,
+    "rating_100": 78,
+    "discount_pct": 73,
+    "price_usd": 7.71,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U06"
+  },
+  {
+    "id": "G011",
+    "name": "Turbo Lines",
+    "tags": [
+      "action",
+      "text"
+    ],
+    "playtime_hours": 13,
+    "rating_100": 87,
+    "discount_pct": 27,
+    "price_usd": 13.48,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U07"
+  },
+  {
+    "id": "G012",
+    "name": "Neon Hollow",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 25,
+    "rating_100": 72,
+    "discount_pct": 47,
+    "price_usd": 16.81,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP05"
+  },
+  {
+    "id": "G013",
+    "name": "Ink Moon",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 21,
+    "rating_100": 81,
+    "discount_pct": 44,
+    "price_usd": 15.99,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U08"
+  },
+  {
+    "id": "G014",
+    "name": "Pulse Ink Bundle",
+    "tags": [
+      "action",
+      "text"
+    ],
+    "playtime_hours": 10,
+    "rating_100": 76,
+    "discount_pct": 42,
+    "price_usd": 9.56,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP09"
+  },
+  {
+    "id": "G015",
+    "name": "Cipher Iron",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 2,
+    "rating_100": 86,
+    "discount_pct": 55,
+    "price_usd": 5.04,
+    "platforms": [
+      "NS"
+    ],
+    "groupId": "U09"
+  },
+  {
+    "id": "G016",
+    "name": "Memory Prism Deluxe",
+    "tags": [
+      "narrative",
+      "puzzle"
+    ],
+    "playtime_hours": 21,
+    "rating_100": 82,
+    "discount_pct": 40,
+    "price_usd": 14.25,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U10"
+  },
+  {
+    "id": "G017",
+    "name": "Paradox Apex",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 18,
+    "rating_100": 76,
+    "discount_pct": 38,
+    "price_usd": 16.22,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U11"
+  },
+  {
+    "id": "G018",
+    "name": "Seasons Stage",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 13,
+    "rating_100": 83,
+    "discount_pct": 35,
+    "price_usd": 12.01,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U12"
+  },
+  {
+    "id": "G019",
+    "name": "Memory Crimson",
+    "tags": [
+      "action",
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 22,
+    "rating_100": 69,
+    "discount_pct": 25,
+    "price_usd": 18.31,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U13"
+  },
+  {
+    "id": "G020",
+    "name": "Lament Iron",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 9,
+    "rating_100": 72,
+    "discount_pct": 57,
+    "price_usd": 6.81,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U14"
+  },
+  {
+    "id": "G021",
+    "name": "Nodes Rift Remaster",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 13,
+    "rating_100": 91,
+    "discount_pct": 0,
+    "price_usd": 18.47,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP02"
+  },
+  {
+    "id": "G022",
+    "name": "Lament Prism Deluxe",
+    "tags": [
+      "narrative",
+      "puzzle"
+    ],
+    "playtime_hours": 25,
+    "rating_100": 65,
+    "discount_pct": 43,
+    "price_usd": 18.08,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP05"
+  },
+  {
+    "id": "G023",
+    "name": "Stage Paradox",
+    "tags": [
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 10,
+    "rating_100": 83,
+    "discount_pct": 29,
+    "price_usd": 14.07,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U15"
+  },
+  {
+    "id": "G024",
+    "name": "Moon Ink",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 17,
+    "rating_100": 79,
+    "discount_pct": 61,
+    "price_usd": 8.23,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP03"
+  },
+  {
+    "id": "G025",
+    "name": "Stage Moon",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 17,
+    "rating_100": 67,
+    "discount_pct": 78,
+    "price_usd": 4.64,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP06"
+  },
+  {
+    "id": "G026",
+    "name": "Apex Paradox",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 18,
+    "rating_100": 67,
+    "discount_pct": 19,
+    "price_usd": 24.76,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP08"
+  },
+  {
+    "id": "G027",
+    "name": "Cipher Rift",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 13,
+    "rating_100": 86,
+    "discount_pct": 53,
+    "price_usd": 8.68,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP02"
+  },
+  {
+    "id": "G028",
+    "name": "Hearts Letters",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 27,
+    "rating_100": 57,
+    "discount_pct": 54,
+    "price_usd": 15.32,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP03"
+  },
+  {
+    "id": "G029",
+    "name": "Echo Portal",
+    "tags": [
+      "narrative",
+      "puzzle"
+    ],
+    "playtime_hours": 20,
+    "rating_100": 61,
+    "discount_pct": 76,
+    "price_usd": 6.66,
+    "platforms": [
+      "NS"
+    ],
+    "groupId": "U16"
+  },
+  {
+    "id": "G030",
+    "name": "Echo Iron",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 27,
+    "rating_100": 78,
+    "discount_pct": 55,
+    "price_usd": 12.47,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U17"
+  },
+  {
+    "id": "G031",
+    "name": "Neon Lament",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 8,
+    "rating_100": 80,
+    "discount_pct": 22,
+    "price_usd": 16.61,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "U18"
+  },
+  {
+    "id": "G032",
+    "name": "Ink Echo",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 25,
+    "rating_100": 85,
+    "discount_pct": 18,
+    "price_usd": 21.64,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP04"
+  },
+  {
+    "id": "G033",
+    "name": "Apex Lines",
+    "tags": [
+      "action",
+      "text"
+    ],
+    "playtime_hours": 22,
+    "rating_100": 69,
+    "discount_pct": 38,
+    "price_usd": 18.19,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP06"
+  },
+  {
+    "id": "G034",
+    "name": "Labyrinth Seasons",
+    "tags": [
+      "narrative",
+      "puzzle"
+    ],
+    "playtime_hours": 7,
+    "rating_100": 73,
+    "discount_pct": 70,
+    "price_usd": 5.23,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP07"
+  },
+  {
+    "id": "G035",
+    "name": "Portal Diary",
+    "tags": [
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 14,
+    "rating_100": 76,
+    "discount_pct": 6,
+    "price_usd": 21.62,
+    "platforms": [
+      "PC",
+      "NS"
+    ],
+    "groupId": "GRP10"
+  },
+  {
+    "id": "G036",
+    "name": "Stage Cipher Deluxe",
+    "tags": [
+      "puzzle",
+      "text"
+    ],
+    "playtime_hours": 22,
+    "rating_100": 80,
+    "discount_pct": 85,
+    "price_usd": 4.4,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP09"
+  },
+  {
+    "id": "G037",
+    "name": "Circuit Pulse",
+    "tags": [
+      "action",
+      "puzzle"
+    ],
+    "playtime_hours": 12,
+    "rating_100": 76,
+    "discount_pct": 41,
+    "price_usd": 12.63,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP07"
+  },
+  {
+    "id": "G038",
+    "name": "Whisper Turbo",
+    "tags": [
+      "action",
+      "narrative"
+    ],
+    "playtime_hours": 9,
+    "rating_100": 88,
+    "discount_pct": 82,
+    "price_usd": 3.43,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "GRP04"
+  },
+  {
+    "id": "G039",
+    "name": "Memory Script Deluxe",
+    "tags": [
+      "action",
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 6,
+    "rating_100": 69,
+    "discount_pct": 61,
+    "price_usd": 5.4,
+    "platforms": [
+      "PC"
+    ],
+    "groupId": "U19"
+  },
+  {
+    "id": "G040",
+    "name": "Tales Hollow",
+    "tags": [
+      "narrative",
+      "text"
+    ],
+    "playtime_hours": 10,
+    "rating_100": 70,
+    "discount_pct": 0,
+    "price_usd": 23.15,
+    "platforms": [
+      "NS"
+    ],
+    "groupId": "U20"
+  }
+]
