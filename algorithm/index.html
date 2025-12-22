@@ -393,6 +393,18 @@ Promise.all([
   setStatus("err","資料載入失敗，請確認 games.json / players.json 是否與 index.html 同層。");
 });
 
+// 顯示用：中英對照（資料仍用英文 key）
+const tagZh = {
+  action: "動作",
+  narrative: "敘事",
+  puzzle: "解謎",
+  text: "文字"
+};
+
+function tagsToZh(tags){
+  return (tags || []).map(t => tagZh[t] || t);
+}
+  
 /* =========================
    演算法說明（每步）
 ========================= */
@@ -587,7 +599,9 @@ function step3_timeFilter(){
   return {
     time_limit_hours: limit,
     feasible_count: timeFiltered.length,
-    feasible: timeFiltered.map(g=>({id:g.id, name:g.name, playtime_hours:g.playtime_hours}))
+    feasible: timeFiltered.map(g=>({id: g.id, name: g.name, playtime_hours: g.playtime_hours, tags: tagsToZh(g.tags)
+}))
+
   };
 }
 
@@ -603,7 +617,9 @@ function step4_unionFind(){
   });
   return {
     unique_count: uniqueGames.length,
-    unique: uniqueGames.map(g=>({id:g.id, name:g.name, groupId:g.groupId, playtime_hours:g.playtime_hours}))
+    unique: uniqueGames.map(g=>({id: g.id, name: g.name, groupId: g.groupId, playtime_hours: g.playtime_hours, tags: tagsToZh(g.tags)
+}))
+
   };
 }
 
@@ -655,7 +671,8 @@ function step5_greedyDP(){
 
   return {
     greedy_topN: top.map(g=>({id:g.id, score:+g._score.toFixed(3), playtime_hours:g.playtime_hours})),
-    dp_bestSet: bestSet.map(g=>({id:g.id, name:g.name, playtime_hours:g.playtime_hours, score:+g._score.toFixed(3)})),
+    dp_bestSet: bestSet.map(g=>({id: g.id, name: g.name, tags: tagsToZh(g.tags), playtime_hours: g.playtime_hours, score: +g._score.toFixed(3)
+})),
     total_time_hours: totalTime,
     total_score: +totalScore.toFixed(3),
     time_capacity: T
@@ -689,10 +706,15 @@ function step6_maxFlow(){
   }
 
   return {
-    quota,
-    tag_usage: used,
-    balanced_result: picked.map(g=>({id:g.id, name:g.name, tags:g.tags, playtime_hours:g.playtime_hours}))
-  };
+  quota_zh: Object.fromEntries(Object.entries(quota).map(([k,v])=>[tagZh[k]||k, v])),
+  tag_usage_zh: Object.fromEntries(Object.entries(used).map(([k,v])=>[tagZh[k]||k, v])),
+  balanced_result: picked.map(g=>({
+    id:g.id,
+    name:g.name,
+    tags: tagsToZh(g.tags),
+    playtime_hours:g.playtime_hours
+  }))
+};
 }
 
 /* =========================
