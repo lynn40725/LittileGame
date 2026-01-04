@@ -287,7 +287,7 @@
           調整你的偏好，系統會找出最相似的玩家，接著用他們的收藏庫作為推薦來源。
         </p>
 
-        <!-- ✅ 使用者選擇（你截圖消失的那塊，已加回來） -->
+        <!--  使用者選擇（你截圖消失的那塊，已加回來） -->
         <div class="resultBox" style="border-style:solid; border-color:var(--line); background:#fff;">
           <b>使用者選擇</b>
           <div class="row" style="margin-top:10px;">
@@ -316,7 +316,7 @@
         </div>
 
         <div class="controls">
-          <!-- ✅ 目標1：必須「執行 → 確定 → 下一步」 -->
+          <!--  目標1：必須「執行 → 確定 → 下一步」 -->
           <button class="btn primary" id="runBtn" onclick="runCurrentStep()">執行本步驟</button>
           <button class="btn ghost" id="confirmBtn" onclick="confirmStep()" disabled>確定（鎖定結果）</button>
           <button class="btn primary" id="nextBtn" onclick="nextStep()" disabled>下一步 →</button>
@@ -328,7 +328,7 @@
           <div class="muted" id="statusText">請先「執行本步驟」，再按「確定」進入下一步。</div>
         </div>
 
-        <!-- ✅ 展示版輸出（不再是 raw JSON） -->
+        <!--  展示版輸出（不再是 raw JSON） -->
         <div class="resultBox" id="resultBox">
           資料載入中…（若一直卡住，請確認 games.json / players.json 與 index.html 同層，且以 GitHub Pages 開啟）
         </div>
@@ -370,7 +370,7 @@
 
 <script>
 /* =========================================================
-   ✅ 你所有目標是否完成（在程式內用行為保證）
+    你所有目標是否完成（在程式內用行為保證）
    1) 一步一步：run → confirm → next（next 必須等 confirm）
    2) 顏色可讀：亮色卡片、清楚層次（CSS 已調整）
    3) 右側欄：演算法說明 + 每步結論（本步 + 累積）
@@ -670,26 +670,42 @@ function step5_greedyDP(){
 // Step6 Max Flow（展示版：配額平衡）
 function step6_balance(){
   const quota = {action:2, narrative:2, puzzle:2, text:2};
-  const used = {action:0, narrative:0, puzzle:0, text:0};
-  const picked = [];
+  const used  = {action:0, narrative:0, puzzle:0, text:0};
 
+  const picked = [];
+  const usedGameId  = new Set();   //  同一遊戲 id 不重複
+  const usedGroupId = new Set();   //  同款不同版（groupId）也不重複
+
+  // 以分數由高到低挑（展示版）
   const pool = [...bestSet].sort((a,b)=>(b._score||0)-(a._score||0));
+
   for(const g of pool){
+    //  先擋重複（這就是你現在出現兩個一樣的關鍵修正）
+    if(usedGameId.has(g.id)) continue;
+    if(usedGroupId.has(g.groupId)) continue;
+
+    // 配額檢查：每個 tag 都不能超過配額
     let ok = true;
     for(const tag of g.tags){
       if(quota[tag] !== undefined && used[tag] + 1 > quota[tag]){
         ok = false; break;
       }
     }
+
     if(ok){
       picked.push(g);
+      usedGameId.add(g.id);
+      usedGroupId.add(g.groupId);
+
       for(const tag of g.tags){
         if(used[tag] !== undefined) used[tag] += 1;
       }
     }
   }
+
   return {quota, used, pickedCount:picked.length, picked};
 }
+
 
 /* =========================
    展示：把結果「翻譯成看得懂的人話」
@@ -906,7 +922,7 @@ function runCurrentStep(){
 
     setResultHTML(html);
     stepHasRun = true;
-    setStatus("ready","已執行 ✅ 請按「確定」鎖定結果，才能進入下一步。");
+    setStatus("ready","已執行  請按「確定」鎖定結果，才能進入下一步。");
     updateStepUI();
 
   }catch(e){
@@ -926,7 +942,7 @@ function confirmStep(){
   const text = makeConclusionText(currentStep);
   updateConclusionUI(text);
 
-  setStatus("done","已確定 ✅ 你可以按「下一步」繼續。");
+  setStatus("done","已確定  請按「下一步」繼續。");
   updateStepUI();
 }
 
@@ -934,7 +950,7 @@ function nextStep(){
   if(!stepDone[currentStep]) return;
 
   if(currentStep >= 6){
-    setStatus("done","流程已完成 ✅ 你可以調整偏好或時間後重設再跑一次。");
+    setStatus("done","流程已完成  可以調整偏好或時間後重設再跑一次。");
     return;
   }
 
@@ -971,7 +987,7 @@ function resetAll(){
 }
 
 /* =========================
-   GitHub Pages 資料載入（✅ 修正 404/Unexpected token <）
+   GitHub Pages 資料載入（ 修正 404/Unexpected token <）
 ========================= */
 Promise.all([
   fetch("./games.json").then(r => { if(!r.ok) throw new Error("games.json 讀取失敗（404）"); return r.json(); }),
@@ -981,10 +997,10 @@ Promise.all([
   players = p;
 
   clearResultForStep();
-  setStatus("ready",`資料載入成功 ✅ games: ${games.length}｜players: ${players.length}。請從 Step 1 開始。`);
+  setStatus("ready",`資料載入成功  games: ${games.length}｜players: ${players.length}。請從 Step 1 開始。`);
 
 }).catch(err=>{
-  setResultHTML(`<b>資料載入失敗 ❌</b><div class="muted" style="margin-top:6px;">${err.message}<br>請確認 games.json / players.json 與 index.html 同一層，並透過 GitHub Pages 網址開啟（不要用本機 file://）。</div>`);
+  setResultHTML(`<b>資料載入失敗 </b><div class="muted" style="margin-top:6px;">${err.message}<br>請確認 games.json / players.json 與 index.html 同一層，並透過 GitHub Pages 網址開啟（不要用本機 file://）。</div>`);
   setStatus("err","資料載入失敗：請確認檔案路徑與 GitHub Pages。");
 });
 </script>
