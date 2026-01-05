@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>智慧遊戲選購導覽系統</title>
+<title>遊戲選購導覽系統</title>
 <style>
   :root{
     --bg:#f6f7fb;
@@ -415,8 +415,12 @@ function syncSliderLabels(){
   $("timeLabel").textContent = $("timeLimit").value;
 }
 ["p_action","p_narrative","p_puzzle","p_text","timeLimit"].forEach(id=>{
-  $(id).addEventListener("input", syncSliderLabels);
+  $(id).addEventListener("input", () => {
+    syncSliderLabels();
+    invalidateCurrentStepBecauseInputChanged();
+  });
 });
+
 syncSliderLabels();
 
 function getUser(){
@@ -433,6 +437,28 @@ function setResultHTML(html){
   $("resultBox").innerHTML = html;
 }
 
+function invalidateCurrentStepBecauseInputChanged(){
+  // 只有在某些步驟，滑桿變動才會影響結果
+  const affects =
+    (currentStep === 1) || // KNN 受偏好影響
+    (currentStep === 3) || // Binary Search 受時間影響
+    (currentStep === 5);   // DP 受時間影響（你分數也可能依時間/候選變動）
+
+  if(!affects) return;
+
+  // 如果本步已經執行過，改參數就視為結果作廢
+  if(stepHasRun || stepDone[currentStep] === false){
+    stepHasRun = false;
+    $("confirmBtn").disabled = true;
+    $("nextBtn").disabled = true;
+
+    setStatus("ready","參數已變更：請重新「執行本步驟」以更新結果。");
+    // 也可以選擇清空結果，避免誤會
+    // clearResultForStep();
+  }
+}
+
+  
 /* ===== 每步演算法說明（右側） ===== */
 const algoInfo = {
   1: {
