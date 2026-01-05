@@ -536,7 +536,7 @@ function updateStepUI(){
 }
 updateStepUI();
 
-/* ✅ 修正你截圖問題：切步時清空展示區，不會殘留上一個步驟內容 */
+/*  修正你截圖問題：切步時清空展示區，不會殘留上一個步驟內容 */
 function clearResultForStep(){
   setResultHTML(`<b>等待執行</b><div class="muted" style="margin-top:6px;">請按「執行本步驟」產生此步驟的展示結果。</div>`);
 }
@@ -625,47 +625,97 @@ function step4_unionFind(){
   return {uniqueCount: uniqueGames.length};
 }
 
-// Step5 Greedy+DP（時間背包）
+// Step5 Greedy+DP（時間背包）— 修正版：先去重 + 2D DP + 從最佳 t 回推
 function step5_greedyDP(){
   const T = getUser().timeLimit;
 
-  // 符合度分數（展示用，可調）
-  for(const g of uniqueGames){
+  //  1) 先對 uniqueGames 再做一次保底去重（同 id / 同 groupId 都不重複）
+  //    若你資料 groupId 不可靠，也可以把 groupKey 改成 g.title
+  const seenId = new Set();
+  const seenGroup = new Set();
+  const base = [];
+  for (const g of uniqueGames){
+    const gid = g.groupId ?? g.id;          // groupId 缺失時退回用 id
+    if (seenId.has(g.id)) continue;
+    if (seenGroup.has(gid)) continue;
+    seenId.add(g.id);
+    seenGroup.add(gid);
+    base.push(g);
+  }
+
+  //  2) 算分（展示用，可調）
+  for(const g of base){
     g._score = (g.rating_100/20) + (g.discount_pct/25) - (g.playtime_hours/14);
   }
 
-  const N = Math.min(12, uniqueGames.length);
-  const top = [...uniqueGames].sort((a,b)=>b._score-a._score).slice(0,N);
+  //  3) Greedy 取前 N 名當候選（縮小 DP 範圍）
+  const N = Math.min(12, base.length);
+  const top = [...base].sort((a,b)=>b._score-a._score).slice(0,N);
 
-  const dp = Array(T+1).fill(0);
-  const pick = Array(T+1).fill(null);
-  const prev = Array(T+1).fill(null);
+  //  4) 2D DP：dp[i][t] = 用前 i 個物品，在容量 t 下的最大分數
+  const dp = Array.from({length: N+1}, () => Array(T+1).fill(0));
+  const take = Array.from({length: N+1}, () => Array(T+1).fill(false));
 
-  for(const g of top){
+  for(let i=1;i<=N;i++){
+    const g = top[i-1];
     const w = g.playtime_hours;
     const v = g._score;
-    for(let t=T;t>=w;t--){
-      const cand = dp[t-w] + v;
-      if(cand > dp[t]){
-        dp[t] = cand;
-        pick[t] = g;
-        prev[t] = t-w;
+
+    for(let t=0;t<=T;t++){
+      // 不拿
+      dp[i][t] = dp[i-1][t];
+
+      // 拿（容量夠才考慮）
+      if(t>=w){
+        const cand = dp[i-1][t-w] + v;
+        if(cand > dp[i][t]){
+          dp[i][t] = cand;
+          take[i][t] = true;
+        }
       }
     }
   }
 
-  bestSet = [];
-  let t=T;
-  while(t!=null && pick[t]){
-    bestSet.push(pick[t]);
-    t = prev[t];
+  //  5) 從 dp[N][t] 的最大值位置回推（避免分數負值時 dp[T] 不是最佳）
+  let bestT = 0;
+  for(let t=1;t<=T;t++){
+    if(dp[N][t] > dp[N][bestT]) bestT = t;
   }
+
+  bestSet = [];
+  let t = bestT;
+  for(let i=N;i>=1;i--){
+    if(take[i][t]){
+      const g = top[i-1];
+      bestSet.push(g);
+      t -= g.playtime_hours;
+    }
+  }
+
+  // （回推是倒著拿的，翻轉一下讓顯示更自然）
+  bestSet.reverse();
+
+  //  6) 再保底：bestSet 內不允許同 groupId 重複（理論上不會，但多一層保險）
+  const usedGroup2 = new Set();
+  bestSet = bestSet.filter(g=>{
+    const gid = g.groupId ?? g.id;
+    if(usedGroup2.has(gid)) return false;
+    usedGroup2.add(gid);
+    return true;
+  });
 
   const totalTime = bestSet.reduce((s,g)=>s+g.playtime_hours,0);
   const totalScore = bestSet.reduce((s,g)=>s+g._score,0);
 
-  return {topCount:N, bestCount:bestSet.length, totalTime, totalScore: +totalScore.toFixed(2), capacity:T};
+  return {
+    topCount: N,
+    bestCount: bestSet.length,
+    totalTime,
+    totalScore: +totalScore.toFixed(2),
+    capacity: T
+  };
 }
+
 
 // Step6 Max Flow（展示版：配額平衡）
 function step6_balance(){
